@@ -7,4 +7,9 @@
  * @package MZMBOAUTH
  */
 
+namespace MZoo\MzMboAuth;
+
+// Exit if accessed directly
+defined( 'ABSPATH' ) || exit;
+
  ?>

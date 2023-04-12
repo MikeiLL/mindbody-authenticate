@@ -8,9 +8,14 @@
  *
  * @package MZMBOAUTH
  */
+
 namespace MZoo\MzMboAuth;
 
 use MZoo\MzMindbody as MZ;
+
+// Exit if accessed directly
+defined( 'ABSPATH' ) || exit;
+
 $wposa_obj = MZ\Core\MzMindbodyApi::$settings_page::$wposa_obj;
 $wposa_obj->add_section(
     array(
@@ -59,7 +64,7 @@ $wposa_obj->add_field(
 function oauth_instructions() {
   $html =  '<p>' . __( 'You will now need to create a Mindbody Oauth Client', 'mz-mbo-auth' ) . '</p>';
   $html .= '<p>' . __( 'To do this, log into your Mindbody account and go to the Developer tab. Click on the "Create New Client" button.', 'mz-mbo-auth' ) . '</p>';
-  $html .= '<p>' . sprintf( __('Callback return url for this site appears to be %1$s.', 'mz-mbo-auth'), home_url()) . '</p>';
+  $html .= '<p>' . sprintf( __('Callback return url for this site will be <code>%1$s/mzmbo/authenticate</code>.', 'mz-mbo-auth'), home_url()) . '</p>';
   // https://developers.mindbodyonline.com/Account/Credentials
   return $html;
 }

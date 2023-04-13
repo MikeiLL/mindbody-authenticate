@@ -20,9 +20,6 @@
 
 namespace MZoo\MzMboAuth;
 
-/*
-vW/Q9iBc6a2E9fgQwHp6G2v/YRHNdu4e0cQIN5vANOU=
-60efbb47-c0ac-4b00-9bc3-b0d93f469fa6
 
 /*
  * Define Constants

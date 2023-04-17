@@ -69,7 +69,7 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
       // Build up our form
       let form = '<form id="mzRegisterForm" method="post">';
       JSON.parse(user_tools.required_fields).forEach(function (field) {
-        form += `<label>${field}</label><input type="text" name="${field}" required>`;
+        form += `<label>${field.replaceAll(/([a-z])([A-Z])/g, '$1 $2')} <input type="text" name="${field}" required></label><br>`;
       });
       form += `<input type="hidden" name="mz_mbo_action" value="true">`;
       form += `<input type="hidden" name="nonce" value="${nonce}">`;
@@ -77,6 +77,28 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
       form += `</form>`;
       $.colorbox({html:'<h1>Looks like you need to register with our studio.</h1>'+form});
     });
+
+      on.('sumbit', '#mzRegisterForm', function (event) {
+        event.preventDefault();
+        let form = event.target;
+        let data = new FormData(form);
+        data.append('mz_mbo_action', 'true');
+        data.append('nonce', nonce);
+        fetch(user_tools.ajaxurl, {
+          method: 'POST',
+          body: data
+        }).then(function (response) {
+          return response.json();
+        }).then(function (json) {
+          if (json.success) {
+            $.colorbox.close();
+            window.dispatchEvent(new Event('authenticated'));
+          } else {
+            console.log({"json.data": json.data});
+          }
+        });
+      });
+
 
 		/*
 		 * Define the modal container state which changes depending on login state

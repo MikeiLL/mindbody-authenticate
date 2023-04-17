@@ -33,13 +33,12 @@ function check_post_requests() {
 					!empty($_POST['code']) &&
 					!empty($_POST['session_state'])){
 
-						$access_token = get_oauth_token();
+						$access_token = mzmbo_get_oauth_token();
 
 						if (false !== $access_token) {
 							// Clear Post token so this only runs once.
 							$_POST['id_token'] = "";
-							echo "<h2>GOT TOKEN IS TRUE</h2>";
-							$this->get_universal_id($access_token);
+							mzmbo_get_universal_id($access_token);
 						}
         } else if (!empty($_POST['mz_mbo_action']) && // Make sure it's us.
                         !empty($_POST['Email'])&&

@@ -19,7 +19,7 @@
  */
 
 namespace MZoo\MzMboAuth;
-
+use MZoo\MzMboAuth as NS;
 
 /*
  * Define Constants
@@ -122,6 +122,7 @@ function mindbody_auth_has_mindbody_api() {
     require_once 'request.php';
     require_once 'session.php';
     require_once 'ajax.php';
+    require_once 'enqueue.php';
 	}
 }
 

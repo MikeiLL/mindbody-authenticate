@@ -9,6 +9,8 @@
 
 namespace MZoo\MzMboAuth;
 
+use MZ;
+
 // Exit if accessed directly
 defined( 'ABSPATH' ) || exit;
 
@@ -26,7 +28,7 @@ defined( 'ABSPATH' ) || exit;
 	 * @return TODO
 	 *
 	 */
-	function get_oauth_token() {
+	function mzmbo_get_oauth_token() {
 		$nonce = wp_create_nonce( 'mz_mbo_authenticate_with_api' );
 		$id_token = $_POST['id_token'];
 		$request_body = array(
@@ -36,13 +38,13 @@ defined( 'ABSPATH' ) || exit;
 			'blocking'      		=> true,
 			'headers'       		=> '',
 			'body'          		=> [
-				'client_id'     => MZ\Core\MzMindbodyApi::$oauth_options['mz_mindbody_client_id'],
-				'grant_type'	=> 'authorization_code',
+				'client_id'     => \MZoo\MzMindbody\Core\MzMindbodyApi::$oauth_options['mz_mindbody_client_id'],
+				'grant_type'	  => 'authorization_code',
 				'scope'         => 'email profile openid offline_access Mindbody.Api.Public.v6 PG.ConsumerActivity.Api.Read',
-				'client_secret'	=> MZ\Core\MzMindbodyApi::$oauth_options['mz_mindbody_client_secret'],
-				'code'			=> $_POST['code'],
-				'redirect_uri'	=> home_url(),
-				'nonce'			=> $nonce
+				'client_secret'	=> \MZoo\MzMindbody\Core\MzMindbodyApi::$oauth_options['mz_mindbody_client_secret'],
+				'code'			    => $_POST['code'],
+				'redirect_uri'	=> home_url() . '/mzmbo/authenticate',
+				'nonce'			    => $nonce
 			],
 			'redirection' 			=> 0,
 			'cookies'       => array()
@@ -72,7 +74,7 @@ defined( 'ABSPATH' ) || exit;
 	 *
 	 * @since 2.9.9
 	 */
-	function get_universal_id($token) {
+	function mzmbo_get_universal_id($token) {
 		$response = wp_remote_request(
 			"https://api.mindbodyonline.com/platform/accounts/v1/me",
 			array(
@@ -81,7 +83,7 @@ defined( 'ABSPATH' ) || exit;
 				'httpversion'   		=> '1.0',
 				'blocking'      		=> true,
 				'headers'       		=> [
-					'API-Key' 			=> MZ\Core\MzMindbodyApi::$basic_options['mz_mbo_api_key'],
+					'API-Key' 			=> \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mbo_api_key'],
 					'Authorization' => 'Bearer ' . $token
 				],
 				'body'          		=> '',
@@ -91,8 +93,8 @@ defined( 'ABSPATH' ) || exit;
 		);
 		$response_body = json_decode($response['body']);
 		if (!empty($response_body->id)){
-			$this->save_id_and_token($response_body->id, $token);
-			$siteID = (int) MZ\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'];
+			mzmbo_save_id_and_token($response_body->id, $token);
+			$siteID = (int) \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'];
 			$has_account = false;
 			foreach($response_body->businessProfiles as $studio){
 				if ( $siteID === $studio->businessId ) {
@@ -130,7 +132,7 @@ defined( 'ABSPATH' ) || exit;
 	 * @param string $token Oauth Token from MBO API.
 	 *
 	 */
-	 function save_id_and_token($universal_id, $token) {
+	 function mzmbo_save_id_and_token($universal_id, $token) {
 		$current = new \DateTime();
 		$current->format( 'Y-m-d H:i:s' );
 

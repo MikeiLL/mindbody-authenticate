@@ -1,67 +1,82 @@
+import {choc, set_content, on, DOM} from "https://rosuav.github.io/choc/factory.js";
+const {FORM, INPUT, LABEL} = choc; //autoimport
+
 (function ($) {
     $(document).ready(function ($) {
-      console.log({"mz_mindbody_schedule": mz_mindbody_schedule});
-        // Initialize some variables
-        var nonce = user_tools.login_nonce,
-            // Shortcode atts for current page.
-            atts = mz_mindbody_schedule.atts,
-            // Just one location for use in general MBO site link
-            location = atts.locations[0].toString(),
-            siteID = atts.account ? atts.account : user_tools.account;
+      console.log({"user_tools.required_fields": JSON.parse(user_tools.required_fields)});
+      // Initialize some variables
+      const nonce = user_tools.login_nonce;
+      // Shortcode atts for current page from parent plugin.
+      const atts = mz_mindbody_schedule.atts;
 
-        window.addEventListener('authenticated', function (event) {
-            console.log("classid", mz_mbo_state.classID);
-        });
-        window.addEventListener('need_to_register', function (event) {
-            document.getElementById('studio_registration_form').showModal();
-        });
+
 
 		/**
 		 * State will store and track status
 		 */
-        var mz_mbo_state = {
+    const mz_mbo_state = {
 
-            logged_in: (user_tools.loggedMBO == 1) ? true : false,
-            action: undefined,
-            target: undefined,
-            siteID: undefined,
-            nonce: undefined,
-            location: undefined,
-            classID: undefined,
-            className: undefined,
-            staffName: undefined,
-            classTime: undefined,
-            class_title: undefined,
-            content: undefined,
-            spinner: '<div class="d-flex justify-content-center"><div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div></div>',
-            wrapper: undefined,
-            content_wrapper: '<div class="modal__content" id="signupModalContent"></div>',
-            footer: '<div class="modal__footer" id="signupModalFooter">\n' +
-            '    <a class="btn btn-primary" data-nonce="'+user_tools.signup_nonce+'" id="MBOSchedule" target="_blank">My Classes</a>\n' +
-            '    <a href="https://clients.mindbodyonline.com/ws.asp?&amp;sLoc='+user_tools.location+'&studioid='+user_tools.siteID+'>" class="btn btn-primary btn-xs" id="MBOSite">Manage on Mindbody Site></a>\n' +
-            '    <a class="btn btn-primary btn-xs" id="MBOLogout">Logout</a>\n' +
-            '</div>\n',
-            header: undefined,
-            signup_button: undefined,
-            message: undefined,
-            client_first_name: undefined,
+        logged_in: (user_tools.loggedMBO == 1) ? true : false,
+        action: undefined,
+        target: undefined,
+        siteID: undefined,
+        nonce: undefined,
+        location: undefined,
+        classID: undefined,
+        className: undefined,
+        staffName: undefined,
+        classTime: undefined,
+        class_title: undefined,
+        content: undefined,
+        spinner: '<div class="d-flex justify-content-center"><div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div></div>',
+        wrapper: undefined,
+        content_wrapper: '<div class="modal__content" id="signupModalContent"></div>',
+        footer: '<div class="modal__footer" id="signupModalFooter">\n' +
+        '    <a class="btn btn-primary" data-nonce="'+user_tools.signup_nonce+'" id="MBOSchedule" target="_blank">My Classes</a>\n' +
+        '    <a href="https://clients.mindbodyonline.com/ws.asp?&amp;sLoc='+mz_mindbody_schedule.atts.locations[0].toString()+'&studioid='+mz_mindbody_schedule.siteID+'>" class="btn btn-primary btn-xs" id="MBOSite">Manage on Mindbody Site></a>\n' +
+        '    <a class="btn btn-primary btn-xs" id="MBOLogout">Logout</a>\n' +
+        '</div>\n',
+        header: undefined,
+        signup_button: undefined,
+        message: undefined,
+        client_first_name: undefined,
 
-            login_form: $('#mzLogInContainer').html(),
+        login_form: $('#mzLogInContainer').html(),
 
-            initialize: function(target){
-                this.target = $(target).attr("href");
-                this.siteID = $(target).attr('data-siteID');
-                this.nonce = $(target).attr("data-nonce");
-                this.location = $(target).attr("data-location");
-                this.classID = $(target).attr("data-classID");
-                this.className = $(target).attr("data-className");
-                this.staffName = $(target).attr("data-staffName");
-                this.classTime = $(target).attr("data-time");
-                this.class_title = '<h2>' + this.className + ' ' + user_tools.with + ' ' + this.staffName + '</h2><h3>' + this.classTime + '</h3><hr/>';
-                this.header = '<div class="modal__header" id="modalHeader"><h1>'+user_tools.signup_heading+'</h1>'+this.class_title+'</div>';
-                this.signup_button = '<button class="btn btn-primary" data-nonce="'+this.nonce+'" data-location="'+this.location+'" data-classID="'+this.classID+'" id="signUpForClass">' + user_tools.confirm_signup + '</button>';
-            }
-        };
+        initialize: function(target){
+            this.target = $(target).attr("href");
+            this.siteID = $(target).attr('data-siteID');
+            this.nonce = $(target).attr("data-nonce");
+            this.location = $(target).attr("data-location");
+            this.classID = $(target).attr("data-classID");
+            this.className = $(target).attr("data-className");
+            this.staffName = $(target).attr("data-staffName");
+            this.classTime = $(target).attr("data-time");
+            this.class_title = '<h2>' + this.className + ' ' + mz_mindbody_schedule.with + ' ' + this.staffName + '</h2><h3>' + this.classTime + '</h3><hr/>';
+            this.header = '<div class="modal__header" id="modalHeader"><h1>'+mz_mindbody_schedule.signup_heading+'</h1>'+this.class_title+'</div>';
+            this.signup_button = '<button class="btn btn-primary" data-nonce="'+this.nonce+'" data-location="'+this.location+'" data-classID="'+this.classID+'" id="signUpForClass">' + user_tools.confirm_signup + '</button>';
+        }
+    };
+
+    /**
+     * Event listeners
+     */
+    window.addEventListener('authenticated', function (event) {
+      console.log("classid", mz_mbo_state.classID);
+    });
+    window.addEventListener('need_to_register', function (event) {
+      console.log("need to register");
+      // Build up our form
+      let form = '<form id="mzRegisterForm" method="post">';
+      JSON.parse(user_tools.required_fields).forEach(function (field) {
+        form += `<label>${field}</label><input type="text" name="${field}" required>`;
+      });
+      form += `<input type="hidden" name="mz_mbo_action" value="true">`;
+      form += `<input type="hidden" name="nonce" value="${nonce}">`;
+      form += `<input type="submit" value="Submit">`;
+      form += `</form>`;
+      $.colorbox({html:'<h1>Looks like you need to register with our studio.</h1>'+form});
+    });
 
 		/*
 		 * Define the modal container state which changes depending on login state

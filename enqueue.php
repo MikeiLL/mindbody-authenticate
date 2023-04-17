@@ -14,6 +14,18 @@ namespace MZoo\MzMboAuth;
 defined( 'ABSPATH' ) || exit;
 
 add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\enqueue_scripts' );
+add_filter('script_loader_tag', __NAMESPACE__ . '\add_type_attribute' , 10, 3);
+
+// Load our script as a module, so we can use import.
+function add_type_attribute($tag, $handle, $src) {
+  // if not our script, do nothing and return original $tag
+  if ( 'mz_user_tools' !== $handle ) {
+      return $tag;
+  }
+  // change the script tag by adding type="module" and return it.
+  $tag = '<script type="module" id="' . $handle . '-js" src="' . esc_url( $src ) . '"></script>';
+  return $tag;
+}
 
 /**
  * Enqueue scripts and styles.
@@ -27,8 +39,6 @@ function enqueue_scripts() {
 
   $oauth_options = get_option('mzmbo_oauth_options');
 
-  $protocol = isset( $_SERVER['HTTPS'] ) ? 'https://' : 'http://';
-
   $translated_strings = \MZoo\MzMindbody\MZMBO()->i18n->get();
 
   $mbo_oauth_url_body = [
@@ -41,17 +51,14 @@ function enqueue_scripts() {
     'subscriberId'	         => \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID']
   ];
 
+  $client = new \MZoo\MzMindbody\Client\RetrieveClient();
+  $required_client_fields = $client->get_signup_form_fields();
+
   $params = array(
-    'ajaxurl'                => admin_url( 'admin-ajax.php', $protocol ),
     'user_tools_nonce' => wp_create_nonce( 'mz_user_tools' ),
-    'with'                   => __( 'with', 'mz-mindbody-api' ),
-    'account'                => \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'],
-    'login'                  => $translated_strings['login'],
-    'signup'                 => $translated_strings['sign_up'],
-    'confirm_signup'          => $translated_strings['confirm_signup'],
-    'logout'                 => $translated_strings['logout'],
-    'signup_heading'         => $translated_strings['signup_heading'],
-    'mbo_oauth_url'          => "https://signin.mindbodyonline.com/connect/authorize?" . http_build_query($mbo_oauth_url_body),
+    'loggedMBO'        => false ? 'false' : 'true',
+    'required_fields'  => json_encode($required_client_fields),
+    'mbo_oauth_url'    => "https://signin.mindbodyonline.com/connect/authorize?" . http_build_query($mbo_oauth_url_body),
   );
   wp_localize_script( 'mz_user_tools', 'user_tools', $params );
 }

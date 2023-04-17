@@ -19,7 +19,17 @@ class MzMboApiCalls {
   /**
    * Mindbody Credentials Options
    */
-  public $mz_mindbody_credentials;
+  public $mindbody_credentials;
+
+  /**
+   * Stored Oauth Token
+   */
+  public $stored_token;
+
+  /**
+   * Customer Has Studio Account
+   */
+  public $customer_has_studio_account;
 
   /**
    * Constructor
@@ -29,7 +39,7 @@ class MzMboApiCalls {
    */
 
   public function __construct() {
-    $this->mz_mindbody_credentials = get_option( 'mz_mindbody_oauth_credentials' );
+    $this->mindbody_credentials = get_option( 'mzmbo_oauth_options' );
   }
 	/**
 	 * Get User Token
@@ -44,7 +54,7 @@ class MzMboApiCalls {
 	 * @return TODO
 	 *
 	 */
-	public function mzmbo_get_oauth_token() {
+	public function get_oauth_token() {
     /*
     If a client that is logging in doesn't have an OAuth login but a local login,
     then they will be asked to verify their email. Once they verify the email it
@@ -59,10 +69,10 @@ class MzMboApiCalls {
 			'blocking'      		=> true,
 			'headers'       		=> '',
 			'body'          		=> [
-				'client_id'     => $this->mz_mindbody_credentials['mz_mindbody_client_id'],
+				'client_id'     => $this->mindbody_credentials['mz_mindbody_client_id'],
 				'grant_type'	  => 'authorization_code',
 				'scope'         => 'email profile openid offline_access Mindbody.Api.Public.v6 PG.ConsumerActivity.Api.Read',
-				'client_secret'	=> $this->mz_mindbody_credentials['mz_mindbody_client_secret'],
+				'client_secret'	=> $this->mindbody_credentials['mz_mindbody_client_secret'],
 				'code'			    => $_POST['code'],
 				'redirect_uri'	=> home_url() . '/mzmbo/authenticate',
 				'nonce'			    => $nonce
@@ -93,9 +103,11 @@ class MzMboApiCalls {
 	 *
 	 * Retrieve the users universal id from MBO API.
 	 *
-	 * @since 2.9.9
+	 * @since 1.0.0
+   * @param string $token
+   * @return object|false $response_body
 	 */
-	function mzmbo_get_universal_id($token) {
+	function get_universal_id($token) {
 		$response = wp_remote_request(
 			"https://api.mindbodyonline.com/platform/accounts/v1/me",
 			array(
@@ -113,35 +125,67 @@ class MzMboApiCalls {
 			)
 		);
 		$response_body = json_decode($response['body']);
-		if (!empty($response_body->id)){
-			mzmbo_save_id_and_token($response_body->id, $token);
-			$siteID = (int) \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'];
-			$has_account = false;
-			foreach($response_body->businessProfiles as $studio){
-				if ( $siteID === $studio->businessId ) {
-					$_SESSION['MindbodyAuth']['MBO_USER_Site_ID'] = $studio->profileId;
-					$has_account = true;
-				}
-			}
-			if (true || false === $has_account) {
-				// Need to register for this site.
-				echo "You need to register for this site. \n";
-				echo "get_universal_id 1<pre>";
-				var_dump($_SESSION);
-				echo "</pre>";
-				echo $_SESSION['MindbodyAuth']['MBO_USER_Site_ID'];
-				echo '<script>if (window.opener) window.opener.dispatchEvent(new Event("need_to_register"));</script>';
-			} else {
-				echo $_SESSION['MindbodyAuth']['MBO_USER_Site_ID'];
-				echo "Got the MBO_USER_Site_ID. Now we can do stuff.";
-				echo '<script>if (window.opener) window.opener.dispatchEvent(new Event("authenticated"));</script>';
-			}
-			//echo '<script>window.close();</script>';
-		} else {
-			// This should never happen, but just in case:
-			echo "No Universal ID";
-		}
+    if (empty($response_body->id)) {
+      return false;
+    }
+    $this->save_id_and_token($response_body->id, $token);
+    $siteID = (int) \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'];
+    $this->customer_has_studio_account = false;
+    foreach($response_body->businessProfiles as $studio){
+      if ( $siteID === $studio->businessId ) {
+        $_SESSION['MindbodyAuth']['MBO_USER_Site_ID'] = $studio->profileId;
+        $this->customer_has_studio_account = true;
+      }
+    }
+    return $response_body;
 	}
+
+  /**
+   * Request Studio Registration
+   *
+   *  DEPRECATED
+   * @since 1.0.0
+   * @param object $response_body
+   */
+  public function request_studio_registration($response_body){
+    echo '<script>window.close();</script>';
+
+    return;
+    $universal_fields = ['firstName', 'lastName', 'email'];
+
+		$client = new \MZoo\MzMindbody\Client\RetrieveClient();
+		$fields = $client->get_signup_form_fields();
+		echo "<dialog id=studio_registration_form>";
+		echo "<h3>" . __("Looks like you aren't registered with our studio.", "mz-mindbody-api") . "</h3>";
+		echo "<form method=POST>";
+		echo "<ul>";
+		foreach($fields as $f){
+			echo '<li>';
+				echo $f . ' <input name="' . $f . '" REQUIRED>';
+			echo '</li>';
+		}
+		echo "</ul>";
+		echo '<input type=hidden name="mz_mbo_action" value="true">';
+		echo '<input type=SUBMIT value="' . __("Register Now", "mz-mindbody-api") . '">';
+		echo "</form></dialog>";
+    echo "<h3>Looks like you aren't registered with our studio.</h3>";
+							echo "<form method=POST>";
+							echo "<ul>";
+							foreach($fields as $f){
+								$userField = lcfirst($f);
+								echo '<li>';
+								if (property_exists($response_body, $userField)){
+									echo $f . ' <input name="' . $f . '" value="' . $response_body->$userField. '">';
+								} else {
+									echo $f . ' <input name="' . $f . '">';
+								}
+
+								echo '</li>';
+							}
+							echo "</ul>";
+							echo '<input type=SUBMIT value="Register Now">';
+							echo "</form>";
+  }
 
 	/**
 	 * Save Universal ID and Token
@@ -153,18 +197,72 @@ class MzMboApiCalls {
 	 * @param string $token Oauth Token from MBO API.
 	 *
 	 */
-	 function mzmbo_save_id_and_token($universal_id, $token) {
+	 public function save_id_and_token($universal_id, $token) {
 		$current = new \DateTime();
 		$current->format( 'Y-m-d H:i:s' );
 
-		$stored_token = array(
+		$this->stored_token = array(
 			'stored_time' => $current,
 			'AccessToken' => $token,
 		);
 
-		$_SESSION['MindbodyAuth']['MBO_Public_Oauth_Token'] = $stored_token;
+		$_SESSION['MindbodyAuth']['MBO_Public_Oauth_Token'] = $this->stored_token;
 		$_SESSION['MindbodyAuth']['MBO_Universal_ID'] = $universal_id;
 	}
+
+  /**
+   * Register User with Studio
+   *
+   * @since 1.0.0
+   */
+
+   public function register_user_with_studio() {
+
+    $contactProps = [];
+    foreach($_POST as $k=>$v) {
+      $contactProps[] = ['name' => $k, 'value' => $v];
+     }
+
+      // This will create a Studio Specific Account for user based on MBO Universal Account
+      $response = wp_remote_request(
+        "https://api.mindbodyonline.com/platform/contacts/v1/profiles",
+        array(
+          'method'        		=> 'POST',
+          'timeout'       		=> 55,
+          'httpversion'   		=> '1.0',
+          'blocking'      		=> true,
+          'headers'       		=> [
+            'API-Key' 				=> \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mbo_api_key'],
+            'Authorization'		=> 'Bearer ' . $this->stored_token->AccessToken,
+            'Content-Type'		=> 'application/json',
+            'businessId'      => \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'],
+          ],
+          'body'							=> json_encode([
+              "userId" => $_SESSION['MindbodyAuth']['MBO_Universal_ID'],
+              // Can we count on form containing all required fields?
+              "contactProperties" => $contactProps
+              ]),
+          'redirection' 			=> 0,
+          'cookies'						=> array()
+        )
+      );
+      /* If duplicate
+      [response] => Array
+        (
+            [code] => 409
+            [message] => Conflict
+        )
+      */
+
+      /*
+      [body] => "An unexpected error has occurred.  You can use the following reference id to help us diagnose your problem: '68169b05-ffd4-45b6-9feb-08da0c27e2b5'"
+      [response] => Array
+        (
+            [code] => 500
+            [message] => Internal Server Error
+        )
+    */
+   }
 }
 
  ?>

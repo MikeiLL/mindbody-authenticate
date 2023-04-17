@@ -17,42 +17,43 @@ use MZoo\MzMindbody as MZ;
 defined( 'ABSPATH' ) || exit;
 
 $wposa_obj = MZ\Core\MzMindbodyApi::$settings_page::$wposa_obj;
+
 $wposa_obj->add_section(
-    array(
-        'id'    => 'oauth_options',
-        'title' => __( 'Oauth', 'mz-mbo-auth' ),
-    )
+  array(
+      'id'    => 'mzmbo_oauth_options',
+      'title' => __( 'Oauth', 'mz-mbo-auth' ),
+  )
 );
 
 $wposa_obj->add_field(
-  'oauth_options',
-  array(
-    'id'      => 'mz_mindbody_client_secret',
-    'type'    => 'text',
-    'name'    => __( 'Client Secret', 'mz-mbo-auth' ),
-    'desc'    => '(Request Oauth on MBO developer account.)',
-    'default' => __( '', 'mz-mbo-auth' ),
-    'placeholder' => ""
-  )
+'mzmbo_oauth_options',
+array(
+  'id'      => 'mz_mindbody_client_secret',
+  'type'    => 'text',
+  'name'    => __( 'Client Secret', 'mz-mbo-auth' ),
+  'desc'    => '(Request Oauth on MBO developer account.)',
+  'default' => __( '', 'mz-mbo-auth' ),
+  'placeholder' => ""
+)
 );
 
 // Field: Client ID.
 $wposa_obj->add_field(
-  'oauth_options',
-  array(
-    'id'      => 'mz_mindbody_client_id',
-    'type'    => 'text',
-    'name'    => __( 'Client ID', 'mz-mbo-auth' ),
-    'desc'    => '(Request Oauth on MBO developer account.)',
-    'default' => __( '', 'mz-mbo-auth' ),
-    'placeholder' => "xxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx" // UUID format
-  )
+'mzmbo_oauth_options',
+array(
+  'id'      => 'mz_mindbody_client_id',
+  'type'    => 'text',
+  'name'    => __( 'Client ID', 'mz-mbo-auth' ),
+  'desc'    => '(Request Oauth on MBO developer account.)',
+  'default' => __( '', 'mz-mbo-auth' ),
+  'placeholder' => "xxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx" // UUID format
+)
 );
 
 
 // Field: Instructions.
 $wposa_obj->add_field(
-  'oauth_options',
+  'mzmbo_oauth_options',
   array(
     'id'      => 'oauth_instructions',
     'type'    => 'html',

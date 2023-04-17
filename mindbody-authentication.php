@@ -52,11 +52,12 @@ if ( version_compare( PHP_VERSION, MINIMUM_PHP_VERSION, '<' ) ) {
 } else {
 
 
-  function mindbody_auth_uninstall(){
+  function mindbody_oauth_uninstall(){
     // Clear Admin Options
+    delete_option('mzmbo_oauth_options');
   }
 
-	register_uninstall_hook( __FILE__, 'mindbody_auth_uninstall' );
+	register_uninstall_hook( __FILE__, __NAMESPACE__ . '\mindbody_oauth_uninstall' );
 
 	add_action( 'plugins_loaded', __NAMESPACE__ . '\mindbody_auth_has_mindbody_api', INIT_LEVEL );
 

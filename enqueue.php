@@ -25,7 +25,7 @@ function enqueue_scripts() {
   wp_register_script( 'mz_user_tools', PLUGIN_NAME_URL . 'user-tools.js', array('jquery', 'mz_display_schedule_script'), PLUGIN_VERSION, true );
   wp_enqueue_script( 'mz_user_tools' );
 
-  $oauth_options = get_option('oauth_options');
+  $oauth_options = get_option('mzmbo_oauth_options');
 
   $protocol = isset( $_SERVER['HTTPS'] ) ? 'https://' : 'http://';
 

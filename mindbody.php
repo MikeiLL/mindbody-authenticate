@@ -14,7 +14,23 @@ use MZ;
 // Exit if accessed directly
 defined( 'ABSPATH' ) || exit;
 
+class MzMboApiCalls {
 
+  /**
+   * Mindbody Credentials Options
+   */
+  public $mz_mindbody_credentials;
+
+  /**
+   * Constructor
+   *
+   * @since 1.0.0
+   * @access public
+   */
+
+  public function __construct() {
+    $this->mz_mindbody_credentials = get_option( 'mz_mindbody_oauth_credentials' );
+  }
 	/**
 	 * Get User Token
 	 *
@@ -28,7 +44,12 @@ defined( 'ABSPATH' ) || exit;
 	 * @return TODO
 	 *
 	 */
-	function mzmbo_get_oauth_token() {
+	public function mzmbo_get_oauth_token() {
+    /*
+    If a client that is logging in doesn't have an OAuth login but a local login,
+    then they will be asked to verify their email. Once they verify the email it
+    will then create that OAuth login for them.
+    */
 		$nonce = wp_create_nonce( 'mz_mbo_authenticate_with_api' );
 		$id_token = $_POST['id_token'];
 		$request_body = array(
@@ -38,10 +59,10 @@ defined( 'ABSPATH' ) || exit;
 			'blocking'      		=> true,
 			'headers'       		=> '',
 			'body'          		=> [
-				'client_id'     => \MZoo\MzMindbody\Core\MzMindbodyApi::$oauth_options['mz_mindbody_client_id'],
+				'client_id'     => $this->mz_mindbody_credentials['mz_mindbody_client_id'],
 				'grant_type'	  => 'authorization_code',
 				'scope'         => 'email profile openid offline_access Mindbody.Api.Public.v6 PG.ConsumerActivity.Api.Read',
-				'client_secret'	=> \MZoo\MzMindbody\Core\MzMindbodyApi::$oauth_options['mz_mindbody_client_secret'],
+				'client_secret'	=> $this->mz_mindbody_credentials['mz_mindbody_client_secret'],
 				'code'			    => $_POST['code'],
 				'redirect_uri'	=> home_url() . '/mzmbo/authenticate',
 				'nonce'			    => $nonce
@@ -144,5 +165,6 @@ defined( 'ABSPATH' ) || exit;
 		$_SESSION['MindbodyAuth']['MBO_Public_Oauth_Token'] = $stored_token;
 		$_SESSION['MindbodyAuth']['MBO_Universal_ID'] = $universal_id;
 	}
+}
 
  ?>

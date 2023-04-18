@@ -40,6 +40,7 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
         signup_button: undefined,
         message: undefined,
         client_first_name: undefined,
+        base_url: window.location.origin + "/wp-json/mindbody-auth/v1/",
 
         login_form: $('#mzLogInContainer').html(),
 
@@ -67,37 +68,51 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
     window.addEventListener('need_to_register', function (event) {
       console.log("need to register");
       // Build up our form
-      let form = '<form id="mzRegisterForm" method="post">';
+      let form = '<form id="mzStudioRegisterForm" method="post">';
       JSON.parse(user_tools.required_fields).forEach(function (field) {
         form += `<label>${field.replaceAll(/([a-z])([A-Z])/g, '$1 $2')} <input type="text" name="${field}" required></label><br>`;
       });
-      form += `<input type="hidden" name="mz_mbo_action" value="true">`;
-      form += `<input type="hidden" name="nonce" value="${nonce}">`;
       form += `<input type="submit" value="Submit">`;
       form += `</form>`;
       $.colorbox({html:'<h1>Looks like you need to register with our studio.</h1>'+form});
     });
 
-      on.('sumbit', '#mzRegisterForm', function (event) {
-        event.preventDefault();
-        let form = event.target;
-        let data = new FormData(form);
-        data.append('mz_mbo_action', 'true');
-        data.append('nonce', nonce);
-        fetch(user_tools.ajaxurl, {
-          method: 'POST',
-          body: data
-        }).then(function (response) {
-          return response.json();
-        }).then(function (json) {
-          if (json.success) {
-            $.colorbox.close();
-            window.dispatchEvent(new Event('authenticated'));
-          } else {
-            console.log({"json.data": json.data});
-          }
-        });
-      });
+    on('submit', '#mzStudioRegisterForm', function (event) {
+      console.log("submitting register form");
+      console.log(event);
+      event.preventDefault();
+      let form = event.target;
+      console.log(form);
+      let data = new FormData(form);
+      console.log(data);
+      data.append('mz_mbo_action', 'true');
+      data.append('nonce', mz_mbo_state.nonce);
+      console.log(mz_mindbody_schedule.ajaxurl);
+      console.log(data);
+
+      let display_load_more_button = false;
+      fetch(mz_mbo_state.base_url + 'registeruser?', {'method': 'POST', 'body': data})
+        .then(r => r.json())
+        .then(json => console.log({"json": json}));
+      /* fetch(mz_mindbody_schedule.ajaxurl, {
+        method: 'POST',
+        body: data
+      }).then(function (response) {
+        return response.json();
+      }).then(function (json) {
+        console.log({"json.data": json.data});
+        if (json.success) {
+          $.colorbox.close();
+          window.dispatchEvent(new Event('authenticated'));
+        } else {
+          // console.log({"json.data": json.data});
+        }
+      }); */
+    });
+
+    on('click', '#mzSignUpModal', function (event) {
+      event.preventDefault();
+    });
 
 
 		/*

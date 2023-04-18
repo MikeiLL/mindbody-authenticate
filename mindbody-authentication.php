@@ -122,7 +122,7 @@ function mindbody_auth_has_mindbody_api() {
     require_once 'mindbody.php';
     require_once 'request.php';
     require_once 'session.php';
-    require_once 'ajax.php';
+    require_once 'rest.php';
     require_once 'enqueue.php';
 	}
 }

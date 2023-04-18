@@ -93,6 +93,7 @@ class MzMboApiCalls {
 			if (empty($response_body->access_token)) {
 				return false;
 			} else {
+        $this->save_oauth_token($response_body->access_token);
 				return $response_body->access_token;
 			}
 		}
@@ -128,7 +129,7 @@ class MzMboApiCalls {
     if (empty($response_body->id)) {
       return false;
     }
-    $this->save_id_and_token($response_body->id, $token);
+    $this->save_universal_id($response_body->id);
     $siteID = (int) \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'];
     $this->customer_has_studio_account = false;
     foreach($response_body->businessProfiles as $studio){
@@ -151,6 +152,7 @@ class MzMboApiCalls {
     echo '<script>window.close();</script>';
 
     return;
+    /*
     $universal_fields = ['firstName', 'lastName', 'email'];
 
 		$client = new \MZoo\MzMindbody\Client\RetrieveClient();
@@ -184,29 +186,41 @@ class MzMboApiCalls {
 							}
 							echo "</ul>";
 							echo '<input type=SUBMIT value="Register Now">';
-							echo "</form>";
+							echo "</form>"; */
   }
 
 	/**
-	 * Save Universal ID and Token
+	 * Save Oauth Token
 	 *
-	 * Store Oauth token and universal id in $Session.
+	 * Store Oauth token in $_SESSION..
 	 *
-	 * @since 2.9.9
-	 * @param string $id Universal ID from MBO API.
+	 * @since 1.0.0
 	 * @param string $token Oauth Token from MBO API.
 	 *
 	 */
-	 public function save_id_and_token($universal_id, $token) {
+  public function save_oauth_token($token) {
 		$current = new \DateTime();
-		$current->format( 'Y-m-d H:i:s' );
 
 		$this->stored_token = array(
-			'stored_time' => $current,
+			'stored_time' => $current->format( 'Y-m-d H:i:s' ),
 			'AccessToken' => $token,
 		);
 
+    $_SESSION['MindbodyAuth'] = empty($_SESSION['MindbodyAuth']) ? array() : $_SESSION['MindbodyAuth'];
+
 		$_SESSION['MindbodyAuth']['MBO_Public_Oauth_Token'] = $this->stored_token;
+	}
+
+  	/**
+	 * Save Universal ID
+	 *
+	 * Store universal id in $_SESSION.
+	 *
+	 * @since 1.0.0
+	 * @param string $id Universal ID from MBO API.
+	 *
+	 */
+  public function save_universal_id($universal_id) {
 		$_SESSION['MindbodyAuth']['MBO_Universal_ID'] = $universal_id;
 	}
 
@@ -214,36 +228,37 @@ class MzMboApiCalls {
    * Register User with Studio
    *
    * @since 1.0.0
+   * @param array $params from user form to submit to Mindbody.
    */
-  public function register_user_with_studio() {
+  public function register_user_with_studio( $params ) {
 
     $contactProps = [];
-    foreach($_POST as $k=>$v) {
+    foreach($params as $k=>$v) {
       $contactProps[] = ['name' => lcfirst($k), 'value' => $v];
     }
-
+    $request_body = array(
+      'method'        		=> 'POST',
+      'timeout'       		=> 55,
+      'httpversion'   		=> '1.0',
+      'blocking'      		=> true,
+      'headers'       		=> [
+        'API-Key' 				=> \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mbo_api_key'],
+        'Authorization'		=> 'Bearer ' . $_SESSION['MindbodyAuth']['MBO_Public_Oauth_Token'],
+        'Content-Type'		=> 'application/json',
+        'businessId'      => \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'],
+      ],
+      'body'							=> json_encode([
+          "userId" => $_SESSION['MindbodyAuth']['MBO_Universal_ID'],
+          // Can we count on form containing all required fields?
+          "contactProperties" => $contactProps
+          ]),
+      'redirection' 			=> 0,
+      'cookies'						=> array()
+    );
     // This will create a Studio Specific Account for user based on MBO Universal Account
     $response = wp_remote_request(
       "https://api.mindbodyonline.com/platform/contacts/v1/profiles",
-      array(
-        'method'        		=> 'POST',
-        'timeout'       		=> 55,
-        'httpversion'   		=> '1.0',
-        'blocking'      		=> true,
-        'headers'       		=> [
-          'API-Key' 				=> \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mbo_api_key'],
-          'Authorization'		=> 'Bearer ' . $this->stored_token->AccessToken,
-          'Content-Type'		=> 'application/json',
-          'businessId'      => \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'],
-        ],
-        'body'							=> json_encode([
-            "userId" => $_SESSION['MindbodyAuth']['MBO_Universal_ID'],
-            // Can we count on form containing all required fields?
-            "contactProperties" => $contactProps
-            ]),
-        'redirection' 			=> 0,
-        'cookies'						=> array()
-      )
+      $request_body
     );
       /* If duplicate
       [response] => Array

@@ -61,6 +61,8 @@ function testing() {
  */
 function add_user_to_studio( $request ) {
   $params = $request->get_body_params();
+  $mbo = new MzMboApiCalls();
+  $mbo->register_user_with_studio($params);
   return array( 'result' => 'Salaam. I can hear you.' );
 }
 

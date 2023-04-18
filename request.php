@@ -47,19 +47,7 @@ function check_post_requests() {
             }
             echo '<script>window.close();</script>';
           }
-  } else if (!empty($_POST['mz_mbo_action']) && // Make sure it's us.
-        !empty($_POST['Email']) &&
-        !empty($_POST['FirstName']) &&
-        !empty($_POST['LastName']) ) {
-        // Looks like we want to register this user
-        // This we must delay until $_SESSION is set.
-        // Imitating the way EDD does it around line 100 in their actions.php file.
-
-        // add_action('template_redirect', array($this, 'register_user_with_studio'));
-				// Looks like we want to register this user
-				echo "<h2>REGISTERING YOU WITH STUDIO.</h2>";
-        $mzmbo->register_user_with_studio();
-			}
+  }
 }
 
 

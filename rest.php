@@ -46,9 +46,19 @@ function register_user_with_studio() {
   );
 }
 
-function testing() {
-  return array( 'result' => 'Hi. I can hear you.' );
-}
+add_filter( 'rest_authentication_errors', function( $result ) {
+  // If a previous authentication check was applied,
+  // pass that result along without modification.
+  if ( true === $result || is_wp_error( $result ) ) {
+    return $result;
+  }
+
+  // Shortcut the builtin WP Authorization as per
+  // https://developer.wordpress.org/rest-api/frequently-asked-questions/#require-authentication-for-all-requests
+  // and https://developer.wordpress.org/rest-api/using-the-rest-api/authentication/
+  // If people send unauthorized requests, empty $_SESSIONs will be generated
+  return true;
+});
 
 /**
  * Add User to Studio

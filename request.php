@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit;
 
 // TODO do this the WordPress way
 if ($_SERVER["REQUEST_URI"] == "/mzmbo/authenticate") {
-  check_post_requests();
+  add_action( 'init', __NAMESPACE__ . '\\check_post_requests', 1 );
 }
 
 /**

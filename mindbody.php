@@ -250,12 +250,12 @@ class MzMboApiCalls {
       'blocking'      		=> true,
       'headers'       		=> [
         'API-Key' 				=> \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mbo_api_key'],
-        'Authorization'		=> 'Bearer ' . $_SESSION['MindbodyAuth']['MBO_Public_Oauth_Token'],
+        'Authorization'		=> 'Bearer ' . $_SESSION['MindbodyAuth']['MBO_Public_Oauth_Token']['AccessToken'],
         'Content-Type'		=> 'application/json',
-        'businessId'      => \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'],
       ],
       'body'							=> json_encode([
           "userId" => $_SESSION['MindbodyAuth']['MBO_Universal_ID'],
+          'BusinessId'      => \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'],
           // Can we count on form containing all required fields?
           "contactProperties" => $contactProps
           ]),

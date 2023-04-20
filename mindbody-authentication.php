@@ -118,10 +118,10 @@ function mindbody_auth_has_mindbody_api() {
 		add_action( 'admin_init', __NAMESPACE__ . '\deactivate_plugins', INIT_LEVEL );
 	} else {
     // Load the plugin.
+    require_once 'session.php';
     require_once 'admin-settings.php';
     require_once 'mindbody.php';
     require_once 'request.php';
-    require_once 'session.php';
     require_once 'rest.php';
     require_once 'enqueue.php';
 	}

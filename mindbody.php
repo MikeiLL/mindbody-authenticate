@@ -227,11 +227,18 @@ class MzMboApiCalls {
   /**
    * Register User with Studio
    *
+   * IMPORTANT API NOTES:
+   * The documentation on that endpoint is not totally accurate. The "businessId" should be used in the body of the request
+   * instead of the Header. Leaving that out of the request body will return an error about the business ID.
+   * Another thing that we found during testing is that passing information from the Identity account, email, first name, last
+   * name, also seems to return an error. That information should populate automatically, so the request would only need the
+   * required fields that the business asks for, such as "address_line_1", "state", "city", and "postal_code". The property
+   * "names" will be underscored like that and be all lower case.
+   *
    * @since 1.0.0
    * @param array $params from user form to submit to Mindbody.
    */
   public function register_user_with_studio( $params ) {
-
     $contactProps = [];
     foreach($params as $k=>$v) {
       $contactProps[] = ['name' => lcfirst($k), 'value' => $v];

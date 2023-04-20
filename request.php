@@ -40,7 +40,7 @@ function check_post_requests() {
             // Clear Post token so this only runs once.
             $_POST['id_token'] = "";
             $response = $mzmbo->get_universal_id($access_token);
-            if ($mzmbo->customer_has_studio_account) {
+            if (!empty($mzmbo->customer_has_studio_account)) {
               echo '<script>if (window.opener) window.opener.dispatchEvent(new Event("authenticated"));</script>';
             } else {
               echo '<script>if (window.opener) window.opener.dispatchEvent(new Event("need_to_register"));</script>';

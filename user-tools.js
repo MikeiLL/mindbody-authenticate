@@ -3,12 +3,8 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
 
 (function ($) {
     $(document).ready(function ($) {
-      console.log({"user_tools.required_fields": JSON.parse(user_tools.required_fields)});
-      // Initialize some variables
-      const nonce = user_tools.login_nonce;
       // Shortcode atts for current page from parent plugin.
       const atts = mz_mindbody_schedule.atts;
-
 
 
 		/**
@@ -32,7 +28,7 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
         wrapper: undefined,
         content_wrapper: '<div class="modal__content" id="signupModalContent"></div>',
         footer: '<div class="modal__footer" id="signupModalFooter">\n' +
-        '    <a class="btn btn-primary" data-nonce="'+user_tools.signup_nonce+'" id="MBOSchedule" target="_blank">My Classes</a>\n' +
+        '    <a class="btn btn-primary" data-nonce="'+mz_mindbody_schedule.signup_nonce+'" id="MBOSchedule" target="_blank">My Classes</a>\n' +
         '    <a href="https://clients.mindbodyonline.com/ws.asp?&amp;sLoc='+mz_mindbody_schedule.atts.locations[0].toString()+'&studioid='+mz_mindbody_schedule.siteID+'>" class="btn btn-primary btn-xs" id="MBOSite">Manage on Mindbody Site></a>\n' +
         '    <a class="btn btn-primary btn-xs" id="MBOLogout">Logout</a>\n' +
         '</div>\n',
@@ -78,20 +74,10 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
     });
 
     on('submit', '#mzStudioRegisterForm', function (event) {
-      console.log("submitting register form");
-      console.log(event);
       event.preventDefault();
       let form = event.target;
-      console.log(form);
       let data = new FormData(form);
-      console.log(data);
-      data.append('mz_mbo_action', 'true');
-      data.append('nonce', mz_mbo_state.nonce);
-      console.log(mz_mindbody_schedule.ajaxurl);
-      console.log(data);
-
-      let display_load_more_button = false;
-      fetch(mz_mbo_state.base_url + 'registeruser?', {'method': 'POST', 'body': data})
+      fetch(mz_mbo_state.base_url + `registeruser?`, {method: 'POST', body: data, credentials: 'include'})
         .then(r => r.json())
         .then(json => console.log({"json": json}));
       /* fetch(mz_mindbody_schedule.ajaxurl, {

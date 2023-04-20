@@ -55,9 +55,8 @@ function enqueue_scripts() {
   $required_client_fields = $client->get_signup_form_fields();
 
   $params = array(
-    'user_tools_nonce' => wp_create_nonce( 'mz_user_tools' ),
     'loggedMBO'        => false ? 'false' : 'true',
-    'required_fields'  => json_encode($required_client_fields),
+    'required_fields'   => json_encode($required_client_fields),
     'mbo_oauth_url'    => "https://signin.mindbodyonline.com/connect/authorize?" . http_build_query($mbo_oauth_url_body),
   );
   wp_localize_script( 'mz_user_tools', 'user_tools', $params );

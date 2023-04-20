@@ -66,7 +66,7 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
       // Build up our form
       let form = '<form id="mzStudioRegisterForm" method="post">';
       JSON.parse(user_tools.required_fields).forEach(function (field) {
-        form += `<label>${field.replaceAll(/([a-z])([A-Z])/g, '$1 $2')} <input type="text" name="${field}" required></label><br>`;
+        form += `<label>${field.replaceAll(/(?<!^)([A-Z][a-z]|(?<=[a-z])[^a-z]|(?<=[A-Z])[0-9_])/g, ' $1')} <input type="text" name="${field.replaceAll(/(?<!^)([A-Z][a-z]|(?<=[a-z])[^a-z]|(?<=[A-Z])[0-9_])/g, '_$1').toLowerCase()}" required></label><br>`;
       });
       form += `<input type="submit" value="Submit">`;
       form += `</form>`;

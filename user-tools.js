@@ -66,11 +66,19 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
       // Build up our form
       let form = '<form id="mzStudioRegisterForm" method="post">';
       JSON.parse(user_tools.required_fields).forEach(function (field) {
-        form += `<label>${field.replaceAll(/(?<!^)([A-Z][a-z]|(?<=[a-z])[^a-z]|(?<=[A-Z])[0-9_])/g, ' $1')} <input type="text" name="${field.replaceAll(/(?<!^)([A-Z][a-z]|(?<=[a-z])[^a-z]|(?<=[A-Z])[0-9_])/g, '_$1').toLowerCase()}" required></label><br>`;
+        // Parse for display, addiing space between words.
+        form += `<label>${field.replaceAll(/(?<!^)([A-Z][a-z]|(?<=[a-z])[^a-z]|(?<=[A-Z])[0-9_])/g, ' $1')} `;
+        // Phone needs to have _number append to form field name. Underscore added in subsequent step.
+        if (field.toLowerCase().includes('phone')) {
+          field += 'Number';
+        }
+        // Parse for form fields for submission.
+        form += `<input type="text" name="${field.replaceAll(/(?<!^)([A-Z][a-z]|(?<=[a-z])[^a-z]|(?<=[A-Z])[0-9_])/g, '_$1').toLowerCase()}" required>`;
+        form += `</label > <br>`;
       });
       form += `<input type="submit" value="Submit">`;
       form += `</form>`;
-      $.colorbox({html:'<h1>Looks like you need to register with our studio.</h1>'+form});
+      $.colorbox({html:'<h1 id="registerheading">Looks like you need to register with our studio.</h1><div id="registernotice"></div>'+form});
     });
 
     on('submit', '#mzStudioRegisterForm', function (event) {
@@ -79,21 +87,14 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
       let data = new FormData(form);
       fetch(mz_mbo_state.base_url + `registeruser?`, {method: 'POST', body: data, credentials: 'include'})
         .then(r => r.json())
-        .then(json => console.log({"json": json}));
-      /* fetch(mz_mindbody_schedule.ajaxurl, {
-        method: 'POST',
-        body: data
-      }).then(function (response) {
-        return response.json();
-      }).then(function (json) {
-        console.log({"json.data": json.data});
-        if (json.success) {
-          $.colorbox.close();
-          window.dispatchEvent(new Event('authenticated'));
-        } else {
-          // console.log({"json.data": json.data});
-        }
-      }); */
+        .then(json => {
+          if (json.success) {
+            $.colorbox({html:'<h1>Thanks for registering with our studio. You can now sign up for some classes.</h1>'+form});
+          } else {
+            console.log("error", json);
+            DOM('#registernotice').innerHTML = "Something went wrong: " + json.error;
+          }
+        });
     });
 
     on('click', '#mzSignUpModal', function (event) {

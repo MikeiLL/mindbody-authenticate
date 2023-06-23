@@ -262,28 +262,60 @@ class MzMboApiCalls {
       'redirection' 			=> 0,
       'cookies'						=> array()
     );
+
+    /* I believe the following list shows all possibilities for the formatting of such fields through the OAuth API:
+
+      external_id
+      first_name
+      last_name
+      email
+      middle_name
+      address_line_1
+      address_line_2
+      city
+      state
+      country
+      postal_code
+      home_phone_number
+      work_phone_number
+      mobile_phone_number
+      birth_date
+      referred_by
+      emergency_contact_name
+      emergency_contact_email
+      emergency_contact_phone
+      emergency_contact_relationship
+      gender
+
+      –Raymond
+      */
+
     // This will create a Studio Specific Account for user based on MBO Universal Account
+    // https://api.mindbodyonline.com/platform/index.html
     $response = wp_remote_request(
       "https://api.mindbodyonline.com/platform/contacts/v1/profiles",
       $request_body
     );
-      /* If duplicate
-      [response] => Array
-        (
-            [code] => 409
-            [message] => Conflict
-        )
-      */
 
-      /*
-      [body] => "An unexpected error has occurred.  You can use the following reference id to help us diagnose your problem: '68169b05-ffd4-45b6-9feb-08da0c27e2b5'"
-      [response] => Array
-        (
-            [code] => 500
-            [message] => Internal Server Error
-        )
-    */
-   }
+    if (is_wp_error($response)) {
+      return array( 'error' => $response->get_error_message() );
+    }
+    switch ($response['response']['code']) {
+      case 200:
+        // Success
+        return ["success" => "User successfully registered with studio."];
+        break;
+      case 409:
+        // Duplicate
+        return ["error" => "User already registered with studio."];
+        break;
+      default:
+        // Error
+        return ["error" => $response['body']];
+        break;
+    }
+
+  }
 }
 
  ?>

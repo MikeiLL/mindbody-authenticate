@@ -152,7 +152,7 @@ class MzMboApiCalls {
     echo '<script>window.close();</script>';
 
     return;
-    /*
+
     $universal_fields = ['firstName', 'lastName', 'email'];
 
 		$client = new \MZoo\MzMindbody\Client\RetrieveClient();
@@ -172,21 +172,21 @@ class MzMboApiCalls {
 		echo "</form></dialog>";
     echo "<h3>Looks like you aren't registered with our studio.</h3>";
 							echo "<form method=POST>";
-							echo "<ul>";
+							echo "  <ul>";
 							foreach($fields as $f){
 								$userField = lcfirst($f);
-								echo '<li>';
+								echo '  <li>';
 								if (property_exists($response_body, $userField)){
 									echo $f . ' <input name="' . $f . '" value="' . $response_body->$userField. '">';
 								} else {
 									echo $f . ' <input name="' . $f . '">';
 								}
 
-								echo '</li>';
+								echo '  </li>';
 							}
-							echo "</ul>";
-							echo '<input type=SUBMIT value="Register Now">';
-							echo "</form>"; */
+							echo "  </ul>";
+							echo '  <input type=SUBMIT value="Register Now">';
+							echo "</form>";
   }
 
 	/**

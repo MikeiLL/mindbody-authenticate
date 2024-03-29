@@ -35,11 +35,13 @@ function check_post_requests() {
           $mzmbo = new MzMboApiCalls();
 
           $access_token = $mzmbo->get_oauth_token();
+          //\MZoo\MzMindbody\MZMBO()->helpers->log($access_token);
 
           if (false !== $access_token) {
             // Clear Post token so this only runs once.
             $_POST['id_token'] = "";
             $response = $mzmbo->get_universal_id($access_token);
+            //\MZoo\MzMindbody\MZMBO()->helpers->log($response);
             if (!empty($mzmbo->customer_has_studio_account)) {
               echo '<script>if (window.opener) window.opener.dispatchEvent(new Event("authenticated"));</script>';
             } else {

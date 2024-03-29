@@ -59,24 +59,27 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
      * Event listeners
      */
     window.addEventListener('authenticated', function (event) {
-      console.log("classid", mz_mbo_state.classID);
+      console.log("authenticated! classid", mz_mbo_state.classID, event);
+      render_mbo_modal();
+      render_mbo_modal_activity();
+      $.colorbox({html:'<h1 id="registerheading">Authenticated!</h1><div id="registernotice"></div>'});
     });
     window.addEventListener('need_to_register', function (event) {
       console.log("need to register");
       // Build up our form
-      let form = '<form id="mzStudioRegisterForm" method="post">';
+      let form = '<form id="mzStudioRegisterForm" method="post"><fieldset><legend>Please submit all fields</legend>';
       JSON.parse(user_tools.required_fields).forEach(function (field) {
         // Parse for display, addiing space between words.
-        form += `<label>${field.replaceAll(/(?<!^)([A-Z][a-z]|(?<=[a-z])[^a-z]|(?<=[A-Z])[0-9_])/g, ' $1')} `;
+        form += `<label><span>${field.replaceAll(/(?<!^)([A-Z][a-z]|(?<=[a-z])[^a-z]|(?<=[A-Z])[0-9_])/g, ' $1')}</span> `;
         // Phone needs to have _number append to form field name. Underscore added in subsequent step.
         if (field.toLowerCase().includes('phone')) {
           field += 'Number';
         }
         // Parse for form fields for submission.
         form += `<input type="text" name="${field.replaceAll(/(?<!^)([A-Z][a-z]|(?<=[a-z])[^a-z]|(?<=[A-Z])[0-9_])/g, '_$1').toLowerCase()}" required>`;
-        form += `</label > <br>`;
+        form += `</label > `;
       });
-      form += `<input type="submit" value="Submit">`;
+      form += `</fieldset><input type="submit" value="Submit">`;
       form += `</form>`;
       $.colorbox({html:'<h1 id="registerheading">Looks like you need to register with our studio.</h1><div id="registernotice"></div>'+form});
     });
@@ -92,7 +95,7 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
             $.colorbox({html:'<h1>Thanks for registering with our studio. You can now sign up for some classes.</h1>'+form});
           } else {
             console.log("error", json);
-            DOM('#registernotice').innerHTML = "Something went wrong: " + json.error;
+            DOM('#registernotice').innerHTML = "Something went wrong. Here's what we know: " + json.error;
           }
         });
     });
@@ -105,23 +108,23 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
 		/*
 		 * Define the modal container state which changes depending on login state
 		 */
-        function render_mbo_modal(){
-            var message = (mz_mbo_state.message ? '<p>'+mz_mbo_state.message+'</p>' : '');
-            mz_mbo_state.wrapper = '<div class="modal__wrapper" id="signupModalWrapper">';
-            if (mz_mbo_state.logged_in){
-                mz_mbo_state.wrapper += mz_mbo_state.header;
-                mz_mbo_state.wrapper += '<div class="modal__content" id="signupModalContent">'+message+mz_mbo_state.signup_button+'</div>';
-                mz_mbo_state.wrapper += mz_mbo_state.footer;
-            } else {
-                mz_mbo_state.wrapper += mz_mbo_state.header;
-                mz_mbo_state.wrapper += '<div class="modal__content" id="signupModalContent">'+message+mz_mbo_state.login_form+'</div>';
-            }
-            mz_mbo_state.wrapper += '</div>';
-            if ($('#cboxLoadedContent')) {
-                $('#cboxLoadedContent').html(mz_mbo_state.wrapper);
-            }
-            mz_mbo_state.message = undefined;
+    function render_mbo_modal(){
+        var message = (mz_mbo_state.message ? '<p>'+mz_mbo_state.message+'</p>' : '');
+        mz_mbo_state.wrapper = '<div class="modal__wrapper" id="signupModalWrapper">';
+        if (mz_mbo_state.logged_in){
+            mz_mbo_state.wrapper += mz_mbo_state.header;
+            mz_mbo_state.wrapper += '<div class="modal__content" id="signupModalContent">'+message+mz_mbo_state.signup_button+'</div>';
+            mz_mbo_state.wrapper += mz_mbo_state.footer;
+        } else {
+            mz_mbo_state.wrapper += mz_mbo_state.header;
+            mz_mbo_state.wrapper += '<div class="modal__content" id="signupModalContent">'+message+mz_mbo_state.login_form+'</div>';
         }
+        mz_mbo_state.wrapper += '</div>';
+        if ($('#cboxLoadedContent')) {
+            $('#cboxLoadedContent').html(mz_mbo_state.wrapper);
+        }
+        mz_mbo_state.message = undefined;
+    }
 
 		/*
 		 * Render inner content of modal based on state
@@ -175,20 +178,21 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
          * Initial Modal Window to Register for a Class
          *
          * Also leads to options to login and sign-up with MBO
-         *
          */
         $(document).on('click', "a[data-target=mzSignUpModal]", function (ev) {
           ev.preventDefault();
-          console.log(user_tools.mbo_oauth_url);
+          console.log({url: user_tools.mbo_oauth_url});
             window.open(user_tools.mbo_oauth_url, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
-            mz_mbo_state.classID = ev.target.dataset['classid'];
-            /* mz_mbo_state.initialize(this);
-            if (mz_mbo_state.logged_in) {
+          mz_mbo_state.classID = ev.target.dataset['classid'];
+          console.log("mz_mbo_state", mz_mbo_state);
+            mz_mbo_state.initialize(this);
+            console.log("mz_mbo_state 2", mz_mbo_state, mz_mbo_state.logged_in, mz_mbo_state.logged_in === true);
+            if (mz_mbo_state.logged_in === true) {
                 render_mbo_modal();
             } else {
                 // open window with Oauth login
                 // make local ajax call to get details
-                $.ajax({
+                /* $.ajax({
                     dataType: 'json',
                     url: user_tools.ajaxurl,
                     data: {
@@ -201,9 +205,9 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
                 }) // End Ajax
                     .fail(function (json) {
                         console.log(json);
-                    }); // End Fail
+                    }); // End Fail */
             }
-            $("#mzSignUpModal").load(mz_mbo_state.target, function () {
+            /* $("#mzSignUpModal").load(mz_mbo_state.target, function () {
                 $.colorbox({html: mz_mbo_state.wrapper,  href: mz_mbo_state.target});
                 $("#mzSignUpModal").colorbox();
             }); */

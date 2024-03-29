@@ -135,6 +135,7 @@ class MzMboApiCalls {
     foreach($response_body->businessProfiles as $studio){
       if ( $siteID === $studio->businessId ) {
         $_SESSION['MindbodyAuth']['MBO_USER_Site_ID'] = $studio->profileId;
+        $_SESSION['MindbodyAuth']['MBO_USER_Business_ID'] = $studio->businessId;
         $this->customer_has_studio_account = true;
       }
     }

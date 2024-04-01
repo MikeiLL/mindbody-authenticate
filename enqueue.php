@@ -65,4 +65,4 @@ function enqueue_scripts() {
   wp_localize_script( 'mz_user_tools', 'user_tools', $params );
 }
 
- ?>
+?>

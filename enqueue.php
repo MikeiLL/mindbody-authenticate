@@ -9,6 +9,8 @@
 
 namespace MZoo\MzMboAuth;
 
+use MZoo\MzMindbody as NS;
+
 
 // Exit if accessed directly
 defined( 'ABSPATH' ) || exit;
@@ -55,12 +57,22 @@ function enqueue_scripts() {
 
   $client = new \MZoo\MzMindbody\Client\RetrieveClient();
   $required_client_fields = $client->get_signup_form_fields();
-  $logged_somewhere = isset($_SESSION['MindbodyAuth']['MBO_USER_Business_ID']) ? $_SESSION['MindbodyAuth']['MBO_USER_Business_ID'] : false;
+  $buisness_id = isset($_SESSION['MindbodyAuth']['MBO_USER_Business_ID'])
+  	? $_SESSION['MindbodyAuth']['MBO_USER_Business_ID']
+	: false;
+  $logged_somewhere = isset($buisness_id)
+    ? $buisness_id
+    : false;
 
   $params = array(
-    'loggedMBO'        => $logged_somewhere === (int) $siteId ? 'true' : 'false',
-    'required_fields'   => json_encode($required_client_fields),
-    'mbo_oauth_url'    => "https://signin.mindbodyonline.com/connect/authorize?" . http_build_query($mbo_oauth_url_body),
+    'AuthorizedMBO'       => isset($buisness_id) ? 'true' : 'false',
+    'logged_this_studio'   => (string) $logged_somewhere === (string) $siteId ? 'true' : 'false',
+    'required_fields'       => json_encode($required_client_fields),
+    'siteID'               => $siteId,
+    'confirm_signup'       => $translated_strings['confirm_signup'],
+    // temporary for development
+    'SESSION'              => json_encode($_SESSION),
+    'mbo_oauth_url'        => "https://signin.mindbodyonline.com/connect/authorize?" . http_build_query($mbo_oauth_url_body),
   );
   wp_localize_script( 'mz_user_tools', 'user_tools', $params );
 }

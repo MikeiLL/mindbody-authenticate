@@ -36,8 +36,6 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
           client_first_name: undefined,
           base_url: window.location.origin + "/wp-json/mindbody-auth/v1/",
 
-          login_form: $('#mzLogInContainer').html(),
-
         initialize: function (target) {
             this.target = $(target).attr("href");
             this.siteID = $(target).attr('data-siteID');
@@ -202,23 +200,6 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
           }
 
       });
-
-        /**
-         * Sign In to MBO
-         */
-        $(document).on('submit', 'form[id="mzLogIn"]', function (ev) {
-            ev.preventDefault();
-
-            var form = $(this);
-            var formData = form.serializeArray();
-            var result = { };
-            $.each($('form').serializeArray(), function() {
-                result[this.name] = this.value;
-            });
-
-
-
-        });
 
         /**
          * Logout of MBO

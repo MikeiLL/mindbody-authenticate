@@ -186,43 +186,6 @@ class MzMboApiCalls {
    */
   public function request_studio_registration($response_body){
     echo '<script>window.close();</script>';
-
-    return;
-
-    $universal_fields = ['firstName', 'lastName', 'email'];
-
-		$client = new \MZoo\MzMindbody\Client\RetrieveClient();
-		$fields = $client->get_signup_form_fields();
-		echo "<dialog id=studio_registration_form>";
-		echo "<h3>" . __("Looks like you aren't registered with our studio.", "mz-mindbody-api") . "</h3>";
-		echo "<form method=POST>";
-		echo "<ul>";
-		foreach($fields as $f){
-			echo '<li>';
-				echo $f . ' <input name="' . $f . '" REQUIRED>';
-			echo '</li>';
-		}
-		echo "</ul>";
-		echo '<input type=hidden name="mz_mbo_action" value="true">';
-		echo '<input type=SUBMIT value="' . __("Register Now", "mz-mindbody-api") . '">';
-		echo "</form></dialog>";
-    echo "<h3>Looks like you aren't registered with our studio.</h3>";
-							echo "<form method=POST>";
-							echo "  <ul>";
-							foreach($fields as $f){
-								$userField = lcfirst($f);
-								echo '  <li>';
-								if (property_exists($response_body, $userField)){
-									echo $f . ' <input name="' . $f . '" value="' . $response_body->$userField. '">';
-								} else {
-									echo $f . ' <input name="' . $f . '">';
-								}
-
-								echo '  </li>';
-							}
-							echo "  </ul>";
-							echo '  <input type=SUBMIT value="Register Now">';
-							echo "</form>";
   }
 
 	/**

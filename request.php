@@ -35,7 +35,6 @@ function check_post_requests() {
           $mzmbo = new MzMboApiCalls();
 
           $access_token = $mzmbo->get_oauth_token();
-          //\MZoo\MzMindbody\MZMBO()->helpers->log($access_token);
 
           if (false !== $access_token) {
             // Clear Post token so this only runs once.
@@ -43,7 +42,12 @@ function check_post_requests() {
             $response = $mzmbo->get_universal_id($access_token);
             //\MZoo\MzMindbody\MZMBO()->helpers->log($response);
             if (!empty($mzmbo->customer_has_studio_account)) {
-              echo '<script>if (window.opener) window.opener.dispatchEvent(new Event("authenticated"));</script>';
+              echo '<script>';
+			  echo 'const json = ' . json_encode($response) . ';';
+			  echo 'const authAlert = new CustomEvent("authenticated", { detail: {"firstName": json.firstName, "lastName": json.lastName} });';
+			  echo 'console.log({"authAlert": authAlert});';
+			  echo 'if (window.opener) window.opener.dispatchEvent(authAlert);';
+			  echo '</script>';
             } else {
               echo '<script>if (window.opener) window.opener.dispatchEvent(new Event("need_to_register"));</script>';
             }

@@ -61,8 +61,11 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
       /**
        * Event listeners
        */
-      window.addEventListener('authenticated', function () {
-        $.colorbox({html:'<h1 id="registerheading"></h1><div id="registernotice"></div>'});
+      window.addEventListener('authenticated', function (e) {
+        $.colorbox({html: '<h1 id="registerheading"></h1><div id="registernotice"></div>'});
+        mz_mbo_state.logged_in = true;
+        mz_mbo_state.action = 'login';
+        mz_mbo_state.message = '<h1>Welcome back, ' + e.detail.firstName + ' ' + e.detail.lastName + '</h1>';
         render_mbo_modal();
         render_mbo_modal_activity();
       });
@@ -136,22 +139,27 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
         mz_mbo_state.content = '';
         $('#signupModalContent').html = '';
         if (mz_mbo_state.action == 'processing'){
-            mz_mbo_state.content += mz_mbo_state.spinner;
+          mz_mbo_state.content += mz_mbo_state.spinner;
         } else if (mz_mbo_state.action == 'login_failed') {
-            mz_mbo_state.content += mz_mbo_state.message;
-            mz_mbo_state.content += mz_mbo_state.login_form;
+          mz_mbo_state.content += mz_mbo_state.message;
         } else if (mz_mbo_state.action == 'logout') {
-            mz_mbo_state.content += mz_mbo_state.message;
-            mz_mbo_state.content += mz_mbo_state.login_form;
-            $('#signupModalFooter').remove();
+          console.log("State action is logout.");
+          mz_mbo_state.content += mz_mbo_state.message;
+          mz_mbo_state.logged_in = false;
+          user_tools.logged_this_studio = false;
+          user_tools.AuthorizedMBO = false;
+          sessionStorage.removeItem("MindbodyAuth");
+          setTimeout($.colorbox.close, 3000);
+        } else if (mz_mbo_state.action == 'login') {
+          mz_mbo_state.content += mz_mbo_state.message;
         } else if (mz_mbo_state.action == 'error') {
-            mz_mbo_state.content += mz_mbo_state.message;
+          mz_mbo_state.content += mz_mbo_state.message;
         } else {
-            // login, sign_up_form
-            mz_mbo_state.content += mz_mbo_state.message;
+          // login, sign_up_form
+          mz_mbo_state.content += mz_mbo_state.message;
         }
         if ($('#signupModalContent')) {
-            $('#signupModalContent').html(mz_mbo_state.content);
+          $('#signupModalContent').html(mz_mbo_state.content);
         }
         mz_mbo_state.message = undefined;
       }
@@ -166,7 +174,7 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
           //this will repeat every 5 seconds
           $.ajax({
               dataType: 'json',
-              url: user_tools.ajaxurl,
+              url: mz_mindbody_schedule.ajaxurl,
               data: {action: 'mz_check_client_logged', nonce: 'mz_check_client_logged'},
               success: function(json) {
                   if (json.type == "success") {
@@ -183,10 +191,12 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
        */
       $(document).on('click', "a[data-target=mzSignUpModal]", function (ev) {
         ev.preventDefault();
-        if (mz_mbo_state.logged_in === 'false') {
+        console.log("clicked signup modal");
+        console.log("mz_mbo_state.logged_in", mz_mbo_state.logged_in);
+        if (!!mz_mbo_state.logged_in === false) {
+          console.log("Opening MBO Login")
           window.open(user_tools.mbo_oauth_url, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
-        }
-          else {
+        } else {
             mz_mbo_state.classID = ev.target.dataset['classid'];
             mz_mbo_state.initialize(this);
             render_mbo_modal();
@@ -219,10 +229,10 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
         $(document).on('click', "#MBOLogout", function (ev) {
             ev.preventDefault();
             var nonce = $(this).attr("data-nonce");
-
+            console.log("Logging out");
             $.ajax({
                 dataType: 'json',
-                url: user_tools.ajaxurl,
+                url: mz_mindbody_schedule.ajaxurl,
                 data: {action: 'mz_client_logout', nonce: nonce},
                 beforeSend: function() {
                     mz_mbo_state.action = 'processing';
@@ -261,7 +271,7 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
             $.ajax({
                 type: "GET",
                 dataType: 'json',
-                url: user_tools.ajaxurl,
+                url: mz_mindbody_schedule.ajaxurl,
                 data: {action: 'mz_generate_signup_form', nonce: nonce, classID: classID},
                 beforeSend: function() {
                     mz_mbo_state.action = 'processing';
@@ -305,7 +315,7 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
             $.ajax({
                 type: "GET",
                 dataType: 'json',
-                url: user_tools.ajaxurl,
+                url: mz_mindbody_schedule.ajaxurl,
                 data: {action: 'mz_create_mbo_account', nonce: formData.nonce, classID: formData.classID, form: form.serialize()},
                 beforeSend: function() {
                     mz_mbo_state.action = 'processing';
@@ -343,7 +353,7 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
             $.ajax({
                 type: "GET",
                 dataType: 'json',
-                url: user_tools.ajaxurl,
+                url: mz_mindbody_schedule.ajaxurl,
                 context: this,
                 data: {
                     action: 'mz_register_for_class',
@@ -382,13 +392,14 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
          *
          *
          */
-        $(document).on('click', "a#MBOSchedule", function (ev) {
+      $(document).on('click', "a#MBOSchedule", function (ev) {
+          console.log("mz_mindbody_schedule.ajaxurl", mz_mindbody_schedule.ajaxurl);
             ev.preventDefault();
             $.ajax({
                 type: "GET",
                 dataType: 'json',
-                url: user_tools.ajaxurl,
-                data: {action: 'mz_display_client_schedule', nonce: 'mz_display_client_schedule', location: mz_mbo_state.location, siteID: mz_mbo_state.siteID},
+                url: mz_mindbody_schedule.ajaxurl,
+                data: {action: 'mz_display_client_schedule', nonce: user_tools.nonce, location: mz_mbo_state.location, siteID: mz_mbo_state.siteID},
                 beforeSend: function() {
                     mz_mbo_state.action = 'processing';
                     render_mbo_modal_activity();

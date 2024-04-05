@@ -126,13 +126,16 @@ class MzMboApiCalls {
 			)
 		);
 		$response_body = json_decode($response['body']);
-		NS\MZMBO()->helpers->log("Accounts Me.");
-		NS\MZMBO()->helpers->log($response_body);
 	if (empty($response_body->id)) {
 		return false;
 	}
     $this->customer_has_studio_account = false;
-	$this->save_universal_id($response_body->id);
+	$this->save_universal_details([
+		'id' => $response_body->id,
+		'email' => $response_body->email,
+		'firstName' => $response_body->firstName,
+		'lastName' => $response_body->lastName
+	]);
 	$siteID = \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'];
 	if ($siteID === "-99") {
 		$_SESSION['MindbodyAuth']['MBO_USER_Business_ID'] = $siteID;
@@ -250,11 +253,11 @@ class MzMboApiCalls {
 	 * Store universal id in $_SESSION.
 	 *
 	 * @since 1.0.0
-	 * @param string $id Universal ID from MBO API.
+	 * @param array containing id, email, firstName, lastName from MBO API.
 	 *
 	 */
-  public function save_universal_id($universal_id) {
-		$_SESSION['MindbodyAuth']['MBO_Universal_ID'] = $universal_id;
+  public function save_universal_details($universal_account) {
+		$_SESSION['MindbodyAuth']['MBO_Universal_Account'] = $universal_account;
 	}
 
   /**
@@ -287,7 +290,7 @@ class MzMboApiCalls {
 		  'Content-Type'		=> 'application/json',
 		],
 		'body'				=> json_encode([
-			"userId" => $_SESSION['MindbodyAuth']['MBO_Universal_ID'],
+			"userId" => $_SESSION['MindbodyAuth']['MBO_Universal_Account']['id'],
 			'BusinessId'      => \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'],
 			// Can we count on form containing all required fields?
 			"contactProperties" => $contactProps
@@ -360,7 +363,7 @@ class MzMboApiCalls {
           */
           $_SESSION['MindbodyAuth']['MBO_USER_Business_ID'] = $siteID;
           $retClient = new \MZoo\MzMindbody\Client\RetrieveClient();
-          $result = $retClient->get_clients("", "mike@mzoo.org");
+          $result = $retClient->get_clients('', $_SESSION['MindbodyAuth']['MBO_Universal_Account']['email']);
           NS\MZMBO()->helpers->log($result);
           if (isset($result['Clients'][0]['Id'])) {
             $_SESSION['MindbodyAuth']['MBO_USER_StudioProfile_ID'] = $result['Clients'][0]['Id'];

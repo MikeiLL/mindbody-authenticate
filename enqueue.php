@@ -70,6 +70,7 @@ function enqueue_scripts() {
     'required_fields'       => json_encode($required_client_fields),
     'siteID'               => $siteId,
     'confirm_signup'       => $translated_strings['confirm_signup'],
+	'nonce'                => wp_create_nonce( 'mz_mbo_api' ),
     // temporary for development
     'SESSION'              => json_encode($_SESSION),
     'mbo_oauth_url'        => "https://signin.mindbodyonline.com/connect/authorize?" . http_build_query($mbo_oauth_url_body),

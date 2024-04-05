@@ -27,9 +27,8 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
           wrapper: undefined,
           content_wrapper: '<div class="modal__content" id="signupModalContent"></div>',
           footer: '<div class="modal__footer" id="signupModalFooter">\n' +
-          '    <a class="btn btn-primary" data-nonce="'+mz_mindbody_schedule.signup_nonce+'" id="MBOSchedule" target="_blank">My Classes</a>\n' +
-          '    <a href="https://clients.mindbodyonline.com/ws.asp?&amp;sLoc='+mz_mindbody_schedule.atts.locations[0].toString()+'&studioid='+user_tools.siteID+'>" class="btn btn-primary btn-xs" id="MBOSite">Manage on Mindbody Site></a>\n' +
-          '    <a class="btn btn-primary btn-xs" id="MBOLogout">Logout</a>\n' +
+          '    <a class="btn btn-primary" data-nonce="'+user_tools.nonce+'" id="MBOSchedule" target="_blank">My Classes</a>\n' +
+          '    <a class="btn btn-primary btn-xs" data-nonce="'+user_tools.nonce+'" id="MBOLogout">Logout</a>\n' +
           '</div>\n',
           header: undefined,
           signup_button: undefined,

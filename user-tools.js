@@ -70,13 +70,10 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
         $.colorbox({html: '<h1 id="registerheading"></h1><div id="registernotice"></div>'});
         mz_mbo_state.logged_in = true;
         mz_mbo_state.action = 'login';
-        console.log(e.detail);
-        mz_mbo_state.message = 'Welcome back!';
+        mz_mbo_state.message = `Welcome back, ${e.detail.firstName}!`;
         mz_mbo_state.client_first_name = e.detail.firstName;
         mz_mbo_state.client_last_name = e.detail.lastName;
-        console.log("authenticated mz_mbo_state", mz_mbo_state, mz_mbo_state.message);
         render_mbo_modal();
-        render_mbo_modal_activity();
       });
       window.addEventListener('need_to_register', function () {
         // Build up our form
@@ -146,7 +143,6 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
         } else if (mz_mbo_state.action + "" === "login_failed") {
           mz_mbo_state.content += mz_mbo_state.message;
         } else if (mz_mbo_state.action + "" === "logout") {
-          console.log("State action is logout.");
           mz_mbo_state.content += mz_mbo_state.message;
           mz_mbo_state.logged_in = false;
           user_tools.logged_this_studio = false;

@@ -1,0 +1,50 @@
+#MBOLogout {
+  cursor: pointer;
+  width: 25px;
+  height: 25px;
+  stroke: red;
+}
+
+#MBOLogout:hover {
+  stroke: darkred;
+}
+
+/**
+ * Grid for our modal windows
+ *
+ */
+
+.modal__wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal__footer,
+.modal__header {
+  min-height: 40px;
+  overflow: auto;
+}
+
+.modal__content {
+  flex: 1;
+  padding: 0 1em;
+  overflow: auto;
+}
+
+
+.modal__footer {
+  min-height: 40px;
+  overflow: auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 1em;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  justify-content: space-between;
+  gap: 1em;
+  align-items: center;
+}

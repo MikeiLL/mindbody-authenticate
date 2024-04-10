@@ -127,4 +127,11 @@ function mindbody_auth_has_mindbody_api() {
 	}
 }
 
+function enqueue(){
+    //wp_enqueue_style('string $handle', mixed $src, array $deps, mixed $ver, string $meida );
+    wp_enqueue_style('mindbody_auth_style', plugin_dir_url( __FILE__ ) . '/style.css', [], NS . 'PLUGIN_VERSION', 'all' );
+    //wp_enqueue_style('string $handle', mixed $src, array $deps, mixed $ver, bol $in_footer );
+}
+add_action('wp_enqueue_scripts', __NAMESPACE__ . '\enqueue');
+
 ?>

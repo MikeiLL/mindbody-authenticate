@@ -1,12 +1,31 @@
 #MBOLogout {
+  border-radius: 20px;
+  border: 2px solid #AA0011;
   cursor: pointer;
-  width: 25px;
-  height: 25px;
-  stroke: red;
 }
 
-#MBOLogout:hover {
-  stroke: darkred;
+#MBOLogout:disabled {
+  border: 2px solid #333;
+  cursor: not-allowed;
+}
+
+#MBOLogout svg {
+  stroke: #AA0011;
+  width: 25px;
+  height: 25px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  background-color: #777;
+}
+
+button:disabled svg {
+  stroke: #333;
+}
+
+#MBOLogout:hover svg {
+  stroke: #AAAA00;
 }
 
 /**

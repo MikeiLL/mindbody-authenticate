@@ -34,18 +34,19 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
         base_url: window.location.origin + "/wp-json/mindbody-auth/v1/",
 
         initialize: function (target) {
-            this.target = $(target).attr("href");
-            this.siteID = $(target).attr('data-siteID');
-            this.nonce = $(target).attr("data-nonce");
-            this.location = $(target).attr("data-location");
-            this.classID = $(target).attr("data-classID");
-            this.className = $(target).attr("data-className");
-            this.staffName = $(target).attr("data-staffName");
-            this.classTime = $(target).attr("data-time");
-            this.class_title = '<h2>' + this.className + ' ' + mz_mindbody_schedule.with + ' ' + this.staffName + '</h2><h3>' + this.classTime + '</h3><hr/>';
-            this.header = '<div class="modal__header" id="modalHeader"><h1>'+mz_mindbody_schedule.signup_heading+'</h1>'+this.class_title+'</div>';
-            this.signup_button = '<button class="btn btn-primary" data-nonce="'+this.nonce+'" data-location="'+this.location+'" data-classID="'+this.classID+'" id="signUpForClass">' + user_tools.confirm_signup + '</button>';
-          }
+          console.log("initialize", target);
+          this.target = $(target).attr("href");
+          this.siteID = $(target).attr('data-siteID');
+          this.nonce = $(target).attr("data-nonce");
+          this.location = $(target).attr("data-location");
+          this.classID = $(target).attr("data-classID");
+          this.className = $(target).attr("data-className");
+          this.staffName = $(target).attr("data-staffName");
+          this.classTime = $(target).attr("data-time");
+          this.class_title = '<h2>' + this.className + ' ' + mz_mindbody_schedule.with + ' ' + this.staffName + '</h2><h3>' + this.classTime + '</h3><hr/>';
+          this.header = '<div class="modal__header" id="modalHeader"><h1>'+mz_mindbody_schedule.signup_heading+'</h1>'+this.class_title+'</div>';
+          this.signup_button = '<button class="btn btn-primary" data-nonce="'+this.nonce+'" data-location="'+this.location+'" data-classID="'+this.classID+'" id="signUpForClass">' + user_tools.confirm_signup + '</button>';
+        }
       };
 
       console.log(mz_mbo_state);
@@ -54,10 +55,10 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
 
       function get_footer(state) {
         return '<div class="modal__footer" id="signupModalFooter">\n' +
-          '    <a class="btn btn-primary" data-nonce="' + user_tools.nonce + '" id="MBOSchedule" target="_blank">My Classes</a>\n' +
+          '    <button class="btn btn-primary" data-nonce="' + user_tools.nonce + '" id="MBOSchedule" target="_blank">My Classes</button>\n' +
           '  <div class="user-info">\n' +
           (state.client_first_name ? '    <span>' + state.client_first_name + ' ' + state.client_last_name + '</span> \n' : "<span></span>") +
-          '    <svg viewBox="0 0 24 24" fill="none" data-nonce="' + user_tools.nonce + '" id="MBOLogout" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12H15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M8 7L3 12L8 17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M21 3L21 21" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>\n' +
+          '    <button data-nonce="' + user_tools.nonce + '" id="MBOLogout" ><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12H15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M8 7L3 12L8 17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M21 3L21 21" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></button>\n' +
           '  </div>\n' +
           '</div>\n';
       }
@@ -116,17 +117,15 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
       * Define the modal container state which changes depending on login state
       */
       function render_mbo_modal() {
-        console.log("render_mbo_modal", mz_mbo_state.message);
+        console.log("render_mbo_modal", mz_mbo_state);
         $.colorbox({html:'<h1 id="registerheading"></h1><div id="registernotice"></div>'});
-        var message = (mz_mbo_state.message ? '<p>'+mz_mbo_state.message+'</p>' : '');
+        const message = (mz_mbo_state.message ? '<p>'+mz_mbo_state.message+'</p>' : '');
         mz_mbo_state.wrapper = '<div class="modal__wrapper" id="signupModalWrapper">';
         if (mz_mbo_state.logged_in + "" === "true"){
           mz_mbo_state.wrapper += mz_mbo_state.header;
+          mz_mbo_state.wrapper += message;
           mz_mbo_state.wrapper += '<div class="modal__content" id="signupModalContent">'+mz_mbo_state.signup_button+'</div>';
           mz_mbo_state.wrapper += get_footer(mz_mbo_state);
-        } else {
-            mz_mbo_state.wrapper += mz_mbo_state.header;
-            mz_mbo_state.wrapper += '<div class="modal__content" id="signupModalContent">'+message+mz_mbo_state.login_form+'</div>';
         }
         mz_mbo_state.wrapper += '</div>';
         if ($('#cboxLoadedContent')) {
@@ -140,19 +139,21 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
     */
     function render_mbo_modal_activity(){
         // Clear content and content wrapper
-        mz_mbo_state.content = '';
-        $('#signupModalContent').html = '';
+        mz_mbo_state.content = "";
+        $("#signupModalContent").html = "";
         if (mz_mbo_state.action == 'processing'){
           mz_mbo_state.content += mz_mbo_state.spinner;
-        } else if (mz_mbo_state.action == 'login_failed') {
+        } else if (mz_mbo_state.action + "" === "login_failed") {
           mz_mbo_state.content += mz_mbo_state.message;
-        } else if (mz_mbo_state.action == 'logout') {
+        } else if (mz_mbo_state.action + "" === "logout") {
           console.log("State action is logout.");
           mz_mbo_state.content += mz_mbo_state.message;
           mz_mbo_state.logged_in = false;
           user_tools.logged_this_studio = false;
           user_tools.AuthorizedMBO = false;
           sessionStorage.removeItem("MindbodyAuth");
+          $('#signupModalFooter button').prop("disabled",true);
+          $('#signupModalContent button').prop("disabled",true);
           setTimeout($.colorbox.close, 3000);
         } else if (mz_mbo_state.action == 'login') {
           mz_mbo_state.content += mz_mbo_state.message;
@@ -196,16 +197,14 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
        */
       $(document).on('click', "a[data-target=mzSignUpModal]", function (ev) {
         ev.preventDefault();
-        console.log("clicked signup modal");
-        console.log("mz_mbo_state.logged_in", mz_mbo_state.logged_in);
+        mz_mbo_state.classID = ev.target.dataset['classid'];
+        console.log("initialize mz_mbo_state on click", mz_mbo_state);
+        mz_mbo_state.initialize(this);
         if (mz_mbo_state.logged_in + "" !== "true") {
-          console.log("Opening MBO Login")
           window.open(user_tools.mbo_oauth_url, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
         } else {
-            mz_mbo_state.classID = ev.target.dataset['classid'];
-            mz_mbo_state.initialize(this);
-            render_mbo_modal();
-          }
+          render_mbo_modal();
+        }
 
       });
 
@@ -381,34 +380,32 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
        *
        */
       $(document).on('click', "a#MBOSchedule", function (ev) {
-          console.log("mz_mindbody_schedule.ajaxurl", mz_mindbody_schedule.ajaxurl);
-            ev.preventDefault();
-            $.ajax({
-                type: "GET",
-                dataType: 'json',
-                url: mz_mindbody_schedule.ajaxurl,
-                data: {action: 'mz_display_client_schedule', nonce: user_tools.nonce, location: mz_mbo_state.location, siteID: mz_mbo_state.siteID},
-                beforeSend: function() {
-                    mz_mbo_state.action = 'processing';
+        $.ajax({
+            type: "GET",
+            dataType: 'json',
+            url: mz_mindbody_schedule.ajaxurl,
+            data: {action: 'mz_display_client_schedule', nonce: user_tools.nonce, location: mz_mbo_state.location, siteID: mz_mbo_state.siteID},
+            beforeSend: function() {
+                mz_mbo_state.action = 'processing';
+                render_mbo_modal_activity();
+            },
+            success: function (json) {
+                if (json.type == "success") {
+                    mz_mbo_state.action = 'display_schedule';
+                    mz_mbo_state.message = json.message;
                     render_mbo_modal_activity();
-                },
-                success: function (json) {
-                    if (json.type == "success") {
-                        mz_mbo_state.action = 'display_schedule';
-                        mz_mbo_state.message = json.message;
-                        render_mbo_modal_activity();
-                    } else {
-                        mz_mbo_state.action = 'error';
-                        mz_mbo_state.message = 'ERROR RETRIEVING YOUR SCHEDULE. ' + json.message;
-                        render_mbo_modal_activity();
-                    }
-                } // ./ Ajax Success
-            }) // End Ajax
-                .fail(function (json) {
-                    mz_mbo_state.message = 'ERROR RETRIEVING YOUR SCHEDULE';
+                } else {
+                    mz_mbo_state.action = 'error';
+                    mz_mbo_state.message = 'ERROR RETRIEVING YOUR SCHEDULE. ' + json.message;
                     render_mbo_modal_activity();
-                    console.log(json);
-                }); // End Fail
+                }
+            } // ./ Ajax Success
+        }) // End Ajax
+            .fail(function (json) {
+                mz_mbo_state.message = 'ERROR RETRIEVING YOUR SCHEDULE';
+                render_mbo_modal_activity();
+                console.log(json);
+            }); // End Fail
 
         });
 

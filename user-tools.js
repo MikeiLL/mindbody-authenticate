@@ -165,7 +165,7 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
         } else if (mz_mbo_state.action + ""  === "display_schedule") {
           console.log('Classes', mz_mbo_state.data);
           window.schedule = mz_mbo_state.data;
-          mz_mbo_state.content += '<ul class="schedule">';
+          mz_mbo_state.content += '<ul class="client-schedule client-schedule__day">';
           mz_mbo_state.data
             && Object.entries(mz_mbo_state.data).forEach(([key, value]) => {
               const date = new Date(key);
@@ -176,7 +176,7 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
               };
               mz_mbo_state.content += "<li>";
               mz_mbo_state.content += "<h3>" + date.toLocaleDateString('en-US', dateOptions) + "</h3>";
-              mz_mbo_state.content += "<ul>";
+              mz_mbo_state.content += '<ul class="client-schedule__item">';
               value.forEach(function (item) {
                 const startDate = new Date(item.start_datetime);
                 const endDate = new Date(item.end_datetime);

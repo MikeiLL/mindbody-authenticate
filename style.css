@@ -67,3 +67,22 @@ button:disabled svg {
   gap: 1em;
   align-items: center;
 }
+
+.client-schedule {
+  list-style-type: none;
+}
+
+.client-schedule ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.client-schedule ul.client-schedule__item li {
+  margin-bottom: 0.5em;
+  display: flex;
+  justify-content: space-between;
+  max-width: 100%;
+  padding: 0.5em;
+  background: #999;
+  gap: 0.2em;
+}

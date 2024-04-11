@@ -45,7 +45,7 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
           this.classTime = $(target).attr("data-time");
           this.class_title = '<h2>' + this.className + ' ' + mz_mindbody_schedule.with + ' ' + this.staffName + '</h2><h3>' + this.classTime + '</h3><hr/>';
           this.header = '<div class="modal__header" id="modalHeader"><h1>'+mz_mindbody_schedule.signup_heading+'</h1>'+this.class_title+'</div>';
-          this.signup_button = '<button class="btn btn-primary" data-nonce="'+this.nonce+'" data-location="'+this.location+'" data-classID="'+this.classID+'" id="signUpForClass">' + user_tools.confirm_signup + '</button>';
+          this.signup_button = '<button class="btn btn-primary" data-nonce="'+user_tools.nonce+'" data-location="'+this.location+'" data-classID="'+this.classID+'" id="signUpForClass">' + user_tools.confirm_signup + '</button>';
         }
       };
 
@@ -177,7 +177,7 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
           $.ajax({
               dataType: 'json',
               url: mz_mindbody_schedule.ajaxurl,
-              data: {action: 'mz_check_client_logged', nonce: 'mz_check_client_logged'},
+              data: {action: 'mz_check_client_logged', nonce: user_tools.nonce},
               success: function(json) {
                   if (json.type == "success") {
                       mz_mbo_state.logged_in = (json.message == 1 ? true : false);
@@ -248,7 +248,6 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
        */
       $(document).on('click', "a#createMBOAccount", function (ev) {
           ev.preventDefault();
-          var target = $(this).attr("href");
           var nonce = $(this).attr("data-nonce");
           var classID = $(this).attr("data-classID");
           $.ajax({
@@ -339,7 +338,7 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
               url: mz_mindbody_schedule.ajaxurl,
               context: this,
               data: {
-                  action: 'mz_register_for_class',
+                  action: 'mz_add_client_to_class',
                   nonce: nonce,
                   siteID: mz_mbo_state.siteID,
                   classID: mz_mbo_state.classID,
@@ -353,11 +352,11 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
                 console.log(json);
                   if (json.type == "success") {
                       mz_mbo_state.action = 'register';
-                      mz_mbo_state.message = json.message;
+                      mz_mbo_state.message = json.data;
                       render_mbo_modal_activity();
                   } else {
                       mz_mbo_state.action = 'error';
-                      mz_mbo_state.message = 'ERROR REGISTERING FOR CLASS. ' + json.message;
+                      mz_mbo_state.message = 'ERROR REGISTERING FOR CLASS. ' + json.data;
                       render_mbo_modal_activity();
                   }
               } // ./ Ajax Success

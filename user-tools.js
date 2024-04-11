@@ -354,7 +354,7 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
               },
             success: function (json) {
                 console.log(json);
-                  if (json.type == "success") {
+                  if (json.success) {
                       mz_mbo_state.action = 'register';
                       mz_mbo_state.message = json.data;
                       render_mbo_modal_activity();

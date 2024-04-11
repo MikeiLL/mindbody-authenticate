@@ -152,7 +152,6 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
           mz_mbo_state.logged_in = false;
           user_tools.logged_this_studio = false;
           user_tools.AuthorizedMBO = false;
-          sessionStorage.removeItem("MindbodyAuth");
           $('#signupModalFooter button').prop("disabled",true);
           $('#signupModalContent button').prop("disabled",true);
           setTimeout($.colorbox.close, 3000);

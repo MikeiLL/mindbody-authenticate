@@ -41,115 +41,115 @@ class MzMboApiCalls {
   public function __construct() {
     $this->mindbody_credentials = get_option( 'mzmbo_oauth_options' );
   }
-	/**
-	 * Get User Token
-	 *
-	 * Get Oauth token from MBO API.
+    /**
+     * Get User Token
+     *
+     * Get Oauth token from MBO API.
      *
      * Documentation not linked in MBO API docs, but found here:
      * https://developers.mindbodyonline.com/PlatformDocumentation#post-token
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @return TODO
-	 *
-	 */
-	public function get_oauth_token() {
+     *
+     * @since 1.0.0
+     * @access public
+     * @return TODO
+     *
+     */
+    public function get_oauth_token() {
     /*
     If a client that is logging in doesn't have an OAuth login but a local login,
     then they will be asked to verify their email. Once they verify the email it
     will then create that OAuth login for them.
     */
-		$nonce = wp_create_nonce( 'mz_mbo_authenticate_with_api' );
-		$id_token = $_POST['id_token'];
-		$request_body = array(
-			'method'        		=> 'POST',
-			'timeout'       		=> 55,
-			'httpversion'   		=> '1.0',
-			'blocking'      		=> true,
-			'headers'       		=> '',
-			'body'          		=> [
-				'client_id'     => $this->mindbody_credentials['mz_mindbody_client_id'],
-				'grant_type'	  => 'authorization_code',
-				'scope'         => 'email profile openid offline_access Mindbody.Api.Public.v6 PG.ConsumerActivity.Api.Read',
-				'client_secret'	=> $this->mindbody_credentials['mz_mindbody_client_secret'],
-				'code'			    => $_POST['code'],
-				'redirect_uri'	=> home_url() . '/mzmbo/authenticate',
-				'nonce'			    => $nonce
-			],
-			'redirection' 			=> 0,
-			'cookies'       => array()
-		);
-		$response = wp_remote_request(
-			"https://signin.mindbodyonline.com/connect/token",
-			$request_body
-		);
+        $nonce = wp_create_nonce( 'mz_mbo_authenticate_with_api' );
+        $id_token = $_POST['id_token'];
+        $request_body = array(
+            'method'                => 'POST',
+            'timeout'               => 55,
+            'httpversion'           => '1.0',
+            'blocking'              => true,
+            'headers'               => '',
+            'body'                  => [
+                'client_id'     => $this->mindbody_credentials['mz_mindbody_client_id'],
+                'grant_type'      => 'authorization_code',
+                'scope'         => 'email profile openid offline_access Mindbody.Api.Public.v6 PG.ConsumerActivity.Api.Read',
+                'client_secret'    => $this->mindbody_credentials['mz_mindbody_client_secret'],
+                'code'                => $_POST['code'],
+                'redirect_uri'    => home_url() . '/mzmbo/authenticate',
+                'nonce'                => $nonce
+            ],
+            'redirection'             => 0,
+            'cookies'       => array()
+        );
+        $response = wp_remote_request(
+            "https://signin.mindbodyonline.com/connect/token",
+            $request_body
+        );
 
-		if ( is_wp_error( $response ) ) {
-			$error_message = $response->get_error_message();
-			echo "Something went wrong in getting your auth token: $error_message";
-		} else {
-			$response_body = json_decode($response['body']);
-			if (empty($response_body->access_token)) {
-				return false;
-			} else {
+        if ( is_wp_error( $response ) ) {
+            $error_message = $response->get_error_message();
+            echo "Something went wrong in getting your auth token: $error_message";
+        } else {
+            $response_body = json_decode($response['body']);
+            if (empty($response_body->access_token)) {
+                return false;
+            } else {
         $this->save_oauth_token($response_body->access_token);
-				return $response_body->access_token;
-			}
-		}
-	}
+                return $response_body->access_token;
+            }
+        }
+    }
 
   /**
-	 * Check token with MBO API
-	 *
-	 * Retrieve the users universal id from MBO API.
-	 *
-	 * @since 1.0.0
+     * Check token with MBO API
+     *
+     * Retrieve the users universal id from MBO API.
+     *
+     * @since 1.0.0
    * @param string $token
    * @return object|false $response_body
-	 */
-	function get_universal_id($token) {
-		$response = wp_remote_request(
-			"https://api.mindbodyonline.com/platform/accounts/v1/me",
-			array(
-				'method'        		=> 'GET',
-				'timeout'       		=> 55,
-				'httpversion'   		=> '1.0',
-				'blocking'      		=> true,
-				'headers'       		=> [
-					'API-Key' 			=> \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mbo_api_key'],
-					'Authorization' => 'Bearer ' . $token
-				],
-				'body'          		=> '',
-				'redirection' 			=> 0,
-				'cookies'       => array()
-			)
-		);
-		$response_body = json_decode($response['body']);
-	if (empty($response_body->id)) {
-		return false;
-	}
+     */
+    function get_universal_id($token) {
+        $response = wp_remote_request(
+            "https://api.mindbodyonline.com/platform/accounts/v1/me",
+            array(
+                'method'                => 'GET',
+                'timeout'               => 55,
+                'httpversion'           => '1.0',
+                'blocking'              => true,
+                'headers'               => [
+                    'API-Key'             => \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mbo_api_key'],
+                    'Authorization' => 'Bearer ' . $token
+                ],
+                'body'                  => '',
+                'redirection'             => 0,
+                'cookies'       => array()
+            )
+        );
+        $response_body = json_decode($response['body']);
+    if (empty($response_body->id)) {
+        return false;
+    }
     $this->customer_has_studio_account = false;
-	$this->save_universal_details([
-		'id' => $response_body->id,
-		'email' => $response_body->email,
-		'firstName' => $response_body->firstName,
-		'lastName' => $response_body->lastName
-	]);
-	$siteID = \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'];
-	if ($siteID === "-99") {
-		$_SESSION['MindbodyAuth']['MBO_USER_Business_ID'] = $siteID;
-		$retClient = new \MZoo\MzMindbody\Client\RetrieveClient();
-		NS\MZMBO()->helpers->log($retClient);
-		$result = $retClient->get_clients("", $response_body->email);
-		if (isset($result['Clients'][0]['Id'])) {
-			$_SESSION['MindbodyAuth']['MBO_USER_StudioProfile_ID'] = $result['Clients'][0]['Id'];
-			$this->customer_has_studio_account = true;
-		} else {
-			NS\MZMBO()->helpers->log("No client found");
-		}
-		return $response_body;
-	}
+    $this->save_universal_details([
+        'id' => $response_body->id,
+        'email' => $response_body->email,
+        'firstName' => $response_body->firstName,
+        'lastName' => $response_body->lastName
+    ]);
+    $siteID = \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'];
+    if ($siteID === "-99") {
+        $_SESSION['MindbodyAuth']['MBO_USER_Business_ID'] = $siteID;
+        $retClient = new \MZoo\MzMindbody\Client\RetrieveClient();
+        NS\MZMBO()->helpers->log($retClient);
+        $result = $retClient->get_clients("", $response_body->email);
+        if (isset($result['Clients'][0]['Id'])) {
+            $_SESSION['MindbodyAuth']['MBO_USER_StudioProfile_ID'] = $result['Clients'][0]['Id'];
+            $this->customer_has_studio_account = true;
+        } else {
+            NS\MZMBO()->helpers->log("No client found");
+        }
+        return $response_body;
+    }
     foreach($response_body->businessProfiles as $studio){
       /* \Mzoo\MzMindbody\MZMBO()->helpers->log($studio); */
       if ( (int) $siteID === $studio->businessId ) {
@@ -178,7 +178,7 @@ class MzMboApiCalls {
       return $response_body;
     }
     return $response_body;
-	}
+    }
 
   /**
    * Request Studio Registration
@@ -191,40 +191,40 @@ class MzMboApiCalls {
     echo '<script>window.close();</script>';
   }
 
-	/**
-	 * Save Oauth Token
-	 *
-	 * Store Oauth token in $_SESSION..
-	 *
-	 * @since 1.0.0
-	 * @param string $token Oauth Token from MBO API.
-	 *
-	 */
+    /**
+     * Save Oauth Token
+     *
+     * Store Oauth token in $_SESSION..
+     *
+     * @since 1.0.0
+     * @param string $token Oauth Token from MBO API.
+     *
+     */
   public function save_oauth_token($token) {
-		$current = new \DateTime();
+        $current = new \DateTime();
 
-		$this->stored_token = array(
-			'stored_time' => $current->format( 'Y-m-d H:i:s' ),
-			'AccessToken' => $token,
-		);
+        $this->stored_token = array(
+            'stored_time' => $current->format( 'Y-m-d H:i:s' ),
+            'AccessToken' => $token,
+        );
 
     $_SESSION['MindbodyAuth'] = empty($_SESSION['MindbodyAuth']) ? array() : $_SESSION['MindbodyAuth'];
 
-		$_SESSION['MindbodyAuth']['MBO_Public_Oauth_Token'] = $this->stored_token;
-	}
+        $_SESSION['MindbodyAuth']['MBO_Public_Oauth_Token'] = $this->stored_token;
+    }
 
-  	/**
-	 * Save Universal ID
-	 *
-	 * Store universal id in $_SESSION.
-	 *
-	 * @since 1.0.0
-	 * @param array containing id, email, firstName, lastName from MBO API.
-	 *
-	 */
+      /**
+     * Save Universal ID
+     *
+     * Store universal id in $_SESSION.
+     *
+     * @since 1.0.0
+     * @param array containing id, email, firstName, lastName from MBO API.
+     *
+     */
   public function save_universal_details($universal_account) {
-		$_SESSION['MindbodyAuth']['MBO_Universal_Account'] = $universal_account;
-	}
+        $_SESSION['MindbodyAuth']['MBO_Universal_Account'] = $universal_account;
+    }
 
   /**
    * Register User with Studio
@@ -246,23 +246,23 @@ class MzMboApiCalls {
       $contactProps[] = ['name' => lcfirst($k), 'value' => $v];
     }
     $request_body = array(
-		'method'        		=> 'POST',
-		'timeout'       		=> 55,
-		'httpversion'   		=> '1.0',
-		'blocking'      		=> true,
-		'headers'       		=> [
-		  'API-Key' 				=> \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mbo_api_key'],
-		  'Authorization'		=> 'Bearer ' . $_SESSION['MindbodyAuth']['MBO_Public_Oauth_Token']['AccessToken'],
-		  'Content-Type'		=> 'application/json',
-		],
-		'body'				=> json_encode([
-			"userId" => $_SESSION['MindbodyAuth']['MBO_Universal_Account']['id'],
-			'BusinessId'      => \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'],
-			// Can we count on form containing all required fields?
-			"contactProperties" => $contactProps
-		]),
-		'redirection' 			=> 0,
-		'cookies'						=> array()
+        'method'                => 'POST',
+        'timeout'               => 55,
+        'httpversion'           => '1.0',
+        'blocking'              => true,
+        'headers'               => [
+          'API-Key'                 => \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mbo_api_key'],
+          'Authorization'        => 'Bearer ' . $_SESSION['MindbodyAuth']['MBO_Public_Oauth_Token']['AccessToken'],
+          'Content-Type'        => 'application/json',
+        ],
+        'body'                => json_encode([
+            "userId" => $_SESSION['MindbodyAuth']['MBO_Universal_Account']['id'],
+            'BusinessId'      => \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'],
+            // Can we count on form containing all required fields?
+            "contactProperties" => $contactProps
+        ]),
+        'redirection'             => 0,
+        'cookies'                        => array()
     );
 
     /* I believe the following list shows all possibilities for the formatting of such fields through the OAuth API:
@@ -311,8 +311,8 @@ class MzMboApiCalls {
       case 200:
         // Success
         // Store the user's studio account ID in the session
-				$siteID = \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'];
-				if ((string) "-99" === (string) $siteID) {
+                $siteID = \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'];
+                if ((string) "-99" === (string) $siteID) {
           /*
           Weve assigned your case 04568535 to BUG-16659.
 

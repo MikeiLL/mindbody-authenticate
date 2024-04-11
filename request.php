@@ -26,7 +26,7 @@ function check_post_requests() {
   if (empty($_POST)) {
     return;
   }
-		// Returns from Oauth request
+        // Returns from Oauth request
   if (!empty($_POST['id_token']) &&
         !empty($_POST['scope']) &&
         !empty($_POST['code']) &&
@@ -43,11 +43,11 @@ function check_post_requests() {
             //\MZoo\MzMindbody\MZMBO()->helpers->log($response);
             if (!empty($mzmbo->customer_has_studio_account)) {
               echo '<script>';
-			  echo 'const json = ' . json_encode($response) . ';';
-			  echo 'const authAlert = new CustomEvent("authenticated", { detail: {"firstName": json.firstName, "lastName": json.lastName} });';
-			  echo 'console.log({"authAlert": authAlert});';
-			  echo 'if (window.opener) window.opener.dispatchEvent(authAlert);';
-			  echo '</script>';
+              echo 'const json = ' . json_encode($response) . ';';
+              echo 'const authAlert = new CustomEvent("authenticated", { detail: {"firstName": json.firstName, "lastName": json.lastName} });';
+              echo 'console.log({"authAlert": authAlert});';
+              echo 'if (window.opener) window.opener.dispatchEvent(authAlert);';
+              echo '</script>';
             } else {
               echo '<script>if (window.opener) window.opener.dispatchEvent(new Event("need_to_register"));</script>';
             }

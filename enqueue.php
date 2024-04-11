@@ -52,7 +52,7 @@ function enqueue_scripts() {
     'client_id'              => $oauth_options['mz_mindbody_client_id'],
     'redirect_uri'           => home_url() . '/mzmbo/authenticate',
     'nonce'                  => wp_create_nonce( 'mz_mbo_authenticate_with_api' ),
-    'subscriberId'	         => $siteId
+    'subscriberId'             => $siteId
   ];
 
   $client = new \MZoo\MzMindbody\Client\RetrieveClient();
@@ -61,11 +61,11 @@ function enqueue_scripts() {
     ? $_SESSION['MindbodyAuth']['MBO_USER_Business_ID']
     : false;
   $client_first_name = isset($_SESSION['MindbodyAuth']['MBO_Universal_Account']['firstName'])
-	? $_SESSION['MindbodyAuth']['MBO_Universal_Account']['firstName']
-	: false;
+    ? $_SESSION['MindbodyAuth']['MBO_Universal_Account']['firstName']
+    : false;
   $client_last_name = isset($_SESSION['MindbodyAuth']['MBO_Universal_Account']['lastName'])
-  	? $_SESSION['MindbodyAuth']['MBO_Universal_Account']['lastName']
-	: false;
+      ? $_SESSION['MindbodyAuth']['MBO_Universal_Account']['lastName']
+    : false;
 
   $params = array(
     'AuthorizedMBO'        => isset($_SESSION['MindbodyAuth']['MBO_Universal_Account']) ? 'true' : 'false',
@@ -73,9 +73,9 @@ function enqueue_scripts() {
     'required_fields'       => json_encode($required_client_fields),
     'siteID'               => $siteId,
     'confirm_signup'        => $translated_strings['confirm_signup'],
-	'nonce'                => wp_create_nonce( 'mz_mbo_api' ),
-	'client_first_name'     => $client_first_name,
-	'client_last_name'     => $client_last_name,
+    'nonce'                => wp_create_nonce( 'mz_mbo_api' ),
+    'client_first_name'     => $client_first_name,
+    'client_last_name'     => $client_last_name,
     // temporary for development
     'SESSION'              => json_encode($_SESSION),
     'mbo_oauth_url'        => "https://signin.mindbodyonline.com/connect/authorize?" . http_build_query($mbo_oauth_url_body),

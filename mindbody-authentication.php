@@ -47,8 +47,8 @@ define( NS . 'INIT_LEVEL', 20 );
  * Check the minimum PHP version.
  */
 if ( version_compare( PHP_VERSION, MINIMUM_PHP_VERSION, '<' ) ) {
-	add_action( 'admin_notices', NS . 'minimum_php_version' );
-	add_action( 'admin_init', __NAMESPACE__ . '\deactivate_plugins', INIT_LEVEL );
+    add_action( 'admin_notices', NS . 'minimum_php_version' );
+    add_action( 'admin_init', __NAMESPACE__ . '\deactivate_plugins', INIT_LEVEL );
 } else {
 
 
@@ -57,9 +57,9 @@ if ( version_compare( PHP_VERSION, MINIMUM_PHP_VERSION, '<' ) ) {
     delete_option('mzmbo_oauth_options');
   }
 
-	register_uninstall_hook( __FILE__, __NAMESPACE__ . '\mindbody_oauth_uninstall' );
+    register_uninstall_hook( __FILE__, __NAMESPACE__ . '\mindbody_oauth_uninstall' );
 
-	add_action( 'plugins_loaded', __NAMESPACE__ . '\mindbody_auth_has_mindbody_api', INIT_LEVEL );
+    add_action( 'plugins_loaded', __NAMESPACE__ . '\mindbody_auth_has_mindbody_api', INIT_LEVEL );
 
 }
 
@@ -73,13 +73,13 @@ if ( version_compare( PHP_VERSION, MINIMUM_PHP_VERSION, '<' ) ) {
  * @return void.
  */
 function activation_failed( $error ) {
-	if ( is_admin() && current_user_can( 'activate_plugins' ) ) {
-		?>
-			<div class="notice notice-error is-dismissible"><p><strong>
-				<?php echo esc_html( $error ); ?>
-			</strong></p></div>
-		<?php
-	}
+    if ( is_admin() && current_user_can( 'activate_plugins' ) ) {
+        ?>
+            <div class="notice notice-error is-dismissible"><p><strong>
+                <?php echo esc_html( $error ); ?>
+            </strong></p></div>
+        <?php
+    }
 }
 
 /**
@@ -89,14 +89,14 @@ function activation_failed( $error ) {
  * @return void.
  */
 function deactivate_plugins() {
-	\deactivate_plugins( plugin_basename( __FILE__ ) );
-	if ( is_admin() && current_user_can( 'activate_plugins' ) ) {
-		?>
-			<div class="notice notice-success is-dismissible"><p>
-				<?php esc_html_e( 'Mindbody Authentication plugin has been deactivated.', 'mz-mbo-auth' ); ?>
-			</p></div>
-		<?php
-	}
+    \deactivate_plugins( plugin_basename( __FILE__ ) );
+    if ( is_admin() && current_user_can( 'activate_plugins' ) ) {
+        ?>
+            <div class="notice notice-success is-dismissible"><p>
+                <?php esc_html_e( 'Mindbody Authentication plugin has been deactivated.', 'mz-mbo-auth' ); ?>
+            </p></div>
+        <?php
+    }
 }
 
 /**
@@ -106,17 +106,17 @@ function deactivate_plugins() {
  * @return void.
  */
 function minimum_php_version() {
-	activation_failed( __( 'MZ MBO Access requires PHP version', 'mz-mbo-auth' ) . sprintf( ' %1.1f.', MINIMUM_PHP_VERSION ) );
+    activation_failed( __( 'MZ MBO Access requires PHP version', 'mz-mbo-auth' ) . sprintf( ' %1.1f.', MINIMUM_PHP_VERSION ) );
 }
 
 /**
  * Insure that parent plugin, is active or deactivate plugin.
  */
 function mindbody_auth_has_mindbody_api() {
-	if ( ! class_exists( MZ . '\Core\MzMindbodyApi' ) ) {
-		activation_failed( __( 'Mindbody Authentication requires MZ Mindbody Api.', 'mz-mbo-auth' ) );
-		add_action( 'admin_init', __NAMESPACE__ . '\deactivate_plugins', INIT_LEVEL );
-	} else {
+    if ( ! class_exists( MZ . '\Core\MzMindbodyApi' ) ) {
+        activation_failed( __( 'Mindbody Authentication requires MZ Mindbody Api.', 'mz-mbo-auth' ) );
+        add_action( 'admin_init', __NAMESPACE__ . '\deactivate_plugins', INIT_LEVEL );
+    } else {
     // Load the plugin.
     require_once 'session.php';
     require_once 'admin-settings.php';
@@ -124,7 +124,7 @@ function mindbody_auth_has_mindbody_api() {
     require_once 'request.php';
     require_once 'rest.php';
     require_once 'enqueue.php';
-	}
+    }
 }
 
 function enqueue(){

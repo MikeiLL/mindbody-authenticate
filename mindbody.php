@@ -140,10 +140,13 @@ class MzMboApiCalls {
 	if ($siteID === "-99") {
 		$_SESSION['MindbodyAuth']['MBO_USER_Business_ID'] = $siteID;
 		$retClient = new \MZoo\MzMindbody\Client\RetrieveClient();
+		NS\MZMBO()->helpers->log($retClient);
 		$result = $retClient->get_clients("", $response_body->email);
 		if (isset($result['Clients'][0]['Id'])) {
 			$_SESSION['MindbodyAuth']['MBO_USER_StudioProfile_ID'] = $result['Clients'][0]['Id'];
 			$this->customer_has_studio_account = true;
+		} else {
+			NS\MZMBO()->helpers->log("No client found");
 		}
 		return $response_body;
 	}

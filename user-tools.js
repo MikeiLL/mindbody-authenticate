@@ -105,6 +105,11 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
               $.colorbox({html:'<h1>Thanks for registering with our studio. You can now sign up for some classes.</h1>'+form});
             } else {
               console.log("error", json);
+              // error message on -99 site:
+              // An unexpected error has occurred. You can use the following reference id to help us diagnose your problem: '9e2f64f2-1b49-46ca-afc0-e1f8a07e320f'
+              if (json.error.includes("An unexpected error has occurred. You can use the following reference id to help us diagnose your problem.")) {
+                json.error = json.error + "<h3>(If you are on the -99 Mindbody Sandbox site, you can probably ignore this message.)</h3>";
+              }
               DOM('#registernotice').innerHTML = "Something went wrong with your registration. Here's what we know: " + json.error;
             }
           });

@@ -31,6 +31,7 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
         header: undefined,
         signup_button: undefined,
         message: undefined,
+        data: undefined,
         base_url: window.location.origin + "/wp-json/mindbody-auth/v1/",
 
         initialize: function (target) {
@@ -161,6 +162,32 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
           mz_mbo_state.content += mz_mbo_state.message;
         } else if (mz_mbo_state.action == 'error') {
           mz_mbo_state.content += mz_mbo_state.message;
+        } else if (mz_mbo_state.action + ""  === "display_schedule") {
+          console.log('Classes', mz_mbo_state.data);
+          window.schedule = mz_mbo_state.data;
+          mz_mbo_state.content += '<ul class="schedule">';
+          mz_mbo_state.data
+            && Object.entries(mz_mbo_state.data).forEach(([key, value]) => {
+              const date = new Date(key);
+              const dateOptions = {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+              };
+              mz_mbo_state.content += "<li>";
+              mz_mbo_state.content += "<h3>" + date.toLocaleDateString('en-US', dateOptions) + "</h3>";
+              mz_mbo_state.content += "<ul>";
+              value.forEach(function (item) {
+                const startDate = new Date(item.start_datetime);
+                const endDate = new Date(item.end_datetime);
+                mz_mbo_state.content += "<li>";
+                mz_mbo_state.content += '<span style="font-weight: 900">' + item.class_name + "</span>";
+                mz_mbo_state.content += "<span>" + startDate.toLocaleTimeString() + " - " + endDate.toLocaleTimeString() + "</span>";
+                mz_mbo_state.content += "</li>";
+              });
+              mz_mbo_state.content += "</ul>";
+            });
+          mz_mbo_state.content += '</ul>';
         } else {
           // login, sign_up_form
           mz_mbo_state.content += mz_mbo_state.message;
@@ -378,7 +405,7 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
        *
        *
        */
-      $(document).on('click', "a#MBOSchedule", function (ev) {
+      $(document).on('click', "#MBOSchedule", function (ev) {
         $.ajax({
             type: "GET",
             dataType: 'json',
@@ -389,9 +416,9 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
                 render_mbo_modal_activity();
             },
             success: function (json) {
-                if (json.type == "success") {
+                if (json.success) {
                     mz_mbo_state.action = 'display_schedule';
-                    mz_mbo_state.message = json.message;
+                    mz_mbo_state.data = json.data;
                     render_mbo_modal_activity();
                 } else {
                     mz_mbo_state.action = 'error';

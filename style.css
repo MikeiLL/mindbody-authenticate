@@ -2,6 +2,7 @@
   border-radius: 20px;
   border: 2px solid #AA0011;
   cursor: pointer;
+  display: flex;
 }
 
 #MBOLogout:disabled {

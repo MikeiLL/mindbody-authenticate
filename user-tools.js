@@ -6,6 +6,10 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
       // Shortcode atts for current page from parent plugin.
       const atts = mz_mindbody_schedule.atts;
 
+      if (user_tools.missing_oauth_settings) {
+        console.error("Missing OAuth settings. Please check your Mindbody API settings.");
+      }
+
       /**
        * State will store and track status
        */
@@ -143,6 +147,7 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
     function render_mbo_modal_activity(){
         // Clear content and content wrapper
         mz_mbo_state.content = "";
+        mz_mbo_state.content += mz_mbo_state.signup_button;
         $("#signupModalContent").html = "";
         if (mz_mbo_state.action == 'processing'){
           mz_mbo_state.content += mz_mbo_state.spinner;
@@ -163,31 +168,36 @@ const {FORM, INPUT, LABEL} = choc; //autoimport
         } else if (mz_mbo_state.action == 'error') {
           mz_mbo_state.content += mz_mbo_state.message;
         } else if (mz_mbo_state.action + ""  === "display_schedule") {
-          console.log('Classes', mz_mbo_state.data);
-          window.schedule = mz_mbo_state.data;
-          mz_mbo_state.content += '<ul class="client-schedule client-schedule__day">';
-          mz_mbo_state.data
-            && Object.entries(mz_mbo_state.data).forEach(([key, value]) => {
-              const date = new Date(key);
-              const dateOptions = {
-                weekday: 'short',
-                month: 'short',
-                day: 'numeric',
-              };
-              mz_mbo_state.content += "<li>";
-              mz_mbo_state.content += "<h3>" + date.toLocaleDateString('en-US', dateOptions) + "</h3>";
-              mz_mbo_state.content += '<ul class="client-schedule__item">';
-              value.forEach(function (item) {
-                const startDate = new Date(item.start_datetime);
-                const endDate = new Date(item.end_datetime);
+          window.xschedule = mz_mbo_state.data;
+          if (mz_mbo_state.data) {
+            if (Object.keys(mz_mbo_state.data).length > 0) {
+              mz_mbo_state.content += '<ul class="client-schedule client-schedule__day">';
+              Object.entries(mz_mbo_state.data).forEach(([key, value]) => {
+                const date = new Date(key);
+                const dateOptions = {
+                  weekday: 'short',
+                  month: 'short',
+                  day: 'numeric',
+                };
                 mz_mbo_state.content += "<li>";
-                mz_mbo_state.content += '<span style="font-weight: 900">' + item.class_name + "</span>";
-                mz_mbo_state.content += "<span>" + startDate.toLocaleTimeString() + " - " + endDate.toLocaleTimeString() + "</span>";
-                mz_mbo_state.content += "</li>";
+                mz_mbo_state.content += "<h3>" + date.toLocaleDateString('en-US', dateOptions) + "</h3>";
+                mz_mbo_state.content += '<ul class="client-schedule__item">';
+                value.forEach(function (item) {
+                  const startDate = new Date(item.start_datetime);
+                  const endDate = new Date(item.end_datetime);
+                  mz_mbo_state.content += "<li>";
+                  mz_mbo_state.content += '<span style="font-weight: 900">' + item.class_name + "</span>";
+                  mz_mbo_state.content += "<span>" + startDate.toLocaleTimeString() + " - " + endDate.toLocaleTimeString() + "</span>";
+                  mz_mbo_state.content += "</li>";
+                });
+                mz_mbo_state.content += "</ul>";
               });
-              mz_mbo_state.content += "</ul>";
-            });
-          mz_mbo_state.content += '</ul>';
+              mz_mbo_state.content += '</ul>';
+            } else {
+              mz_mbo_state.content += "<p>No classes in your schedule for the coming month.<p>";
+            }
+          }
+
         } else {
           // login, sign_up_form
           mz_mbo_state.content += mz_mbo_state.message;

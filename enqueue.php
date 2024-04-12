@@ -39,7 +39,7 @@ function enqueue_scripts() {
   wp_register_script( 'mz_user_tools', PLUGIN_NAME_URL . 'user-tools.js', array('jquery', 'mz_display_schedule_script'), PLUGIN_VERSION, true );
   wp_enqueue_script( 'mz_user_tools' );
 
-  $oauth_options = get_option('mzmbo_oauth_options');
+  $oauth_options = get_option('mzmbo_oauth_options', ['mz_mindbody_client_id' => '', 'mz_mindbody_client_secret' => '']);
 
   $translated_strings = \MZoo\MzMindbody\MZMBO()->i18n->get();
 
@@ -79,6 +79,7 @@ function enqueue_scripts() {
     // temporary for development
     'SESSION'              => json_encode($_SESSION),
     'mbo_oauth_url'        => "https://signin.mindbodyonline.com/connect/authorize?" . http_build_query($mbo_oauth_url_body),
+    'missing_oauth_settings' => empty($oauth_options['mz_mindbody_client_id']) || empty($oauth_options['mz_mindbody_client_secret']) ? 'true' : 'false',
   );
   wp_localize_script( 'mz_user_tools', 'user_tools', $params );
 }

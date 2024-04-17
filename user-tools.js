@@ -1,12 +1,9 @@
-import {choc, set_content, on, DOM} from "https://rosuav.github.io/choc/factory.js";
-const {FORM, INPUT, LABEL} = choc; //autoimport
-
 (function ($) {
     $(document).ready(function ($) {
       // Shortcode atts for current page from parent plugin.
       const atts = mz_mindbody_schedule.atts;
 
-      if (user_tools.missing_oauth_settings) {
+      if (user_tools.missing_oauth_settings + "" === "true") {
         console.error("Missing OAuth settings. Please check your Mindbody API settings.");
       }
 

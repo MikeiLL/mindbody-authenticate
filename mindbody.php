@@ -140,7 +140,6 @@ class MzMboApiCalls {
     if ($siteID === "-99") {
         $_SESSION['MindbodyAuth']['MBO_USER_Business_ID'] = $siteID;
         $retClient = new \MZoo\MzMindbody\Client\RetrieveClient();
-        NS\MZMBO()->helpers->log($retClient);
         $result = $retClient->get_clients("", $response_body->email);
         if (isset($result['Clients'][0]['Id'])) {
             $_SESSION['MindbodyAuth']['MBO_USER_StudioProfile_ID'] = $result['Clients'][0]['Id'];
@@ -330,7 +329,6 @@ class MzMboApiCalls {
           $_SESSION['MindbodyAuth']['MBO_USER_Business_ID'] = $siteID;
           $retClient = new \MZoo\MzMindbody\Client\RetrieveClient();
           $result = $retClient->get_clients('', $_SESSION['MindbodyAuth']['MBO_Universal_Account']['email']);
-          NS\MZMBO()->helpers->log($result);
           if (isset($result['Clients'][0]['Id'])) {
             $_SESSION['MindbodyAuth']['MBO_USER_StudioProfile_ID'] = $result['Clients'][0]['Id'];
             $this->customer_has_studio_account = true;

@@ -34,9 +34,9 @@
         message: undefined,
         data: undefined,
         base_url: window.location.origin + "/wp-json/mindbody-auth/v1/",
+        spinner: '<div class="d-flex justify-content-center"><div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div></div>',
 
         initialize: function (target) {
-          console.log("initialize", target);
           this.target = $(target).attr("href");
           this.siteID = $(target).attr('data-siteID');
           this.nonce = $(target).attr("data-nonce");

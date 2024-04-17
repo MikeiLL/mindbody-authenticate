@@ -89,42 +89,52 @@
         });
         form += `</fieldset><input type="submit" value="Submit">`;
         form += `</form>`;
-        $.colorbox({html:'<h1 id="registerheading">Looks like you need to register with our studio.</h1><div id="registernotice"></div>'+form});
+        $.colorbox({html: '<h1 id="registerheading">Looks like you need to register with our studio.</h1><div id="registernotice"></div>' + form});
+
+        on('submit', '#mzStudioRegisterForm', function (event) {
+          event.preventDefault();
+          let form = event.target;
+          let data = new FormData(form);
+          fetch(mz_mbo_state.base_url + `registeruser?`, {method: 'POST', body: data, credentials: 'include'})
+            .then(r => r.json())
+            .then(json => {
+              if (json.success) {
+                $.colorbox({html:'<h1>Thanks for registering with our studio. You can now sign up for some classes.</h1>'+form});
+              } else {
+                console.log("error", json);
+                // error message on -99 site:
+                // An unexpected error has occurred. You can use the following reference id to help us diagnose your problem: '9e2f64f2-1b49-46ca-afc0-e1f8a07e320f'
+                if (json.error.includes("An unexpected error has occurred. You can use the following reference id to help us diagnose your problem.")) {
+                  json.error = json.error + "<h3>(If you are on the -99 Mindbody Sandbox site, you can probably ignore this message.)</h3>";
+                }
+                DOM('#registernotice').innerHTML = "Something went wrong with your registration. Here's what we know: " + json.error;
+              }
+            });
+        });
       });
 
-      on('submit', '#mzStudioRegisterForm', function (event) {
-        event.preventDefault();
-        let form = event.target;
-        let data = new FormData(form);
-        fetch(mz_mbo_state.base_url + `registeruser?`, {method: 'POST', body: data, credentials: 'include'})
-          .then(r => r.json())
-          .then(json => {
-            if (json.success) {
-              $.colorbox({html:'<h1>Thanks for registering with our studio. You can now sign up for some classes.</h1>'+form});
-            } else {
-              console.log("error", json);
-              // error message on -99 site:
-              // An unexpected error has occurred. You can use the following reference id to help us diagnose your problem: '9e2f64f2-1b49-46ca-afc0-e1f8a07e320f'
-              if (json.error.includes("An unexpected error has occurred. You can use the following reference id to help us diagnose your problem.")) {
-                json.error = json.error + "<h3>(If you are on the -99 Mindbody Sandbox site, you can probably ignore this message.)</h3>";
-              }
-              DOM('#registernotice').innerHTML = "Something went wrong with your registration. Here's what we know: " + json.error;
-            }
-          });
-      });
 
       /*
       * Define the modal container state which changes depending on login state
       */
       function render_mbo_modal() {
         console.log("render_mbo_modal", mz_mbo_state);
-        $.colorbox({html:'<h1 id="registerheading"></h1><div id="registernotice"></div>'});
         const message = (mz_mbo_state.message ? '<p>'+mz_mbo_state.message+'</p>' : '');
+        $.colorbox({html:'<h1 id="registerheading"></h1><div id="registernotice"></div>'});
         mz_mbo_state.wrapper = '<div class="modal__wrapper" id="signupModalWrapper">';
         if (mz_mbo_state.logged_in + "" === "true"){
           mz_mbo_state.wrapper += mz_mbo_state.header;
+          mz_mbo_state.wrapper += '<div class="modal__content" id="signupModalContent">';
           mz_mbo_state.wrapper += message;
-          mz_mbo_state.wrapper += '<div class="modal__content" id="signupModalContent">'+mz_mbo_state.signup_button+'</div>';
+
+          if (atts.show_registrants + "" === "1") {
+            mz_mbo_state.wrapper += '<h4>Registrants</h4><div id="ClassRegistrants" style="min-height:90px;"></div>';
+          }
+
+          mz_mbo_state.wrapper += mz_mbo_state.signup_button;
+
+          mz_mbo_state.wrapper += "</div>";
+          //mz_mbo_state.wrapper += mz_mbo_state.spinner;
           mz_mbo_state.wrapper += get_footer(mz_mbo_state);
         }
         mz_mbo_state.wrapper += '</div>';
@@ -134,15 +144,22 @@
         mz_mbo_state.message = undefined;
       }
 
-    /*
-    * Render inner content of modal based on state
-    */
-    function render_mbo_modal_activity(){
+      /*
+      * Render inner content of modal based on state
+      */
+      function render_mbo_modal_activity(){
         // Clear content and content wrapper
         mz_mbo_state.content = "";
-        mz_mbo_state.content += mz_mbo_state.signup_button;
-        $("#signupModalContent").html = "";
-        if (mz_mbo_state.action == 'processing'){
+        // If fetching a particular thing, might want to
+        // render in a specified location as opposed to entire content.
+        let target = "signupModalContent";
+        if (mz_mbo_state.fetching) {
+          target = mz_mbo_state.fetching;
+        } else {
+          mz_mbo_state.content += mz_mbo_state.signup_button;
+        }
+        $("#"+target).html = "";
+        if (mz_mbo_state.action == 'processing') {
           mz_mbo_state.content += mz_mbo_state.spinner;
         } else if (mz_mbo_state.action + "" === "login_failed") {
           mz_mbo_state.content += mz_mbo_state.message;
@@ -195,8 +212,8 @@
           // login, sign_up_form
           mz_mbo_state.content += mz_mbo_state.message;
         }
-        if ($('#signupModalContent')) {
-          $('#signupModalContent').html(mz_mbo_state.content);
+        if ($("#"+target)) {
+          $("#"+target).html(mz_mbo_state.content);
         }
         mz_mbo_state.message = undefined;
       }
@@ -220,6 +237,42 @@
           }); // End Ajax
       }
 
+      // TODO dedupe from main plugin
+      function fetch_registrants(classID) {
+
+        $.ajax({
+          type: "GET",
+          dataType: 'json',
+          url: mz_mindbody_schedule.ajaxurl,
+          data: {action: 'mz_mbo_get_registrants', nonce: mz_mindbody_schedule.display_schedule_nonce, classID: classID},
+          beforeSend: function() {
+            mz_mbo_state.action = 'processing';
+            mz_mbo_state.fetching = 'ClassRegistrants';
+            render_mbo_modal_activity();
+          },
+          success: function (json) {
+            if (json.type == "success") {
+              let htmlRegistrants = '<ul class="mz-classRegistrants">';
+              if ($.isArray(json.message)) {
+                  json.message.forEach(function (name) {
+                    htmlRegistrants += '<li>' + name.replace('_', ' ') + '.</li>';
+                  });
+              } else {
+                htmlRegistrants += '<li>' + json.message + '</li>';
+              }
+              htmlRegistrants += '</ul>';
+              $('#signupModalWrapper').find('#ClassRegistrants')[0].innerHTML = htmlRegistrants;
+            } else {
+              $('#signupModalWrapper').find('#ClassRegistrants')[0].innerHTML = mz_mindbody_schedule.get_registrants_error;
+            }
+          } // ./ Ajax Success
+        }) // End Ajax
+        .fail(function (json) {
+          $('#signupModalWrapper').find('#ClassRegistrants')[0].innerHTML = mz_mindbody_schedule.get_registrants_error;
+        }); // End Fail
+     }
+
+
       /**
        * Initial Modal Window to Register for a Class
        *
@@ -227,13 +280,16 @@
        */
       $(document).on('click', "a[data-target=mzSignUpModal]", function (ev) {
         ev.preventDefault();
-        mz_mbo_state.classID = ev.target.dataset['classid'];
-        console.log("initialize mz_mbo_state on click", mz_mbo_state);
-        mz_mbo_state.initialize(this);
         if (mz_mbo_state.logged_in + "" !== "true") {
           window.open(user_tools.mbo_oauth_url, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
         } else {
+          mz_mbo_state.classID = ev.target.dataset['classid'];
+          mz_mbo_state.initialize(this);
           render_mbo_modal();
+          if (atts.show_registrants + "" === "1") {
+            mz_mbo_state.fetching = 'ClassRegistrants';
+            fetch_registrants(mz_mbo_state.classID);
+          }
         }
 
       });

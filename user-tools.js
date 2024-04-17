@@ -51,13 +51,9 @@
         }
       };
 
-      console.log(mz_mbo_state);
-      window.mz_mbo_state = mz_mbo_state;
-      window.SESSION = JSON.parse(user_tools.SESSION);
-
       function get_footer(state) {
         return '<div class="modal__footer" id="signupModalFooter">\n' +
-          '    <button class="btn btn-primary" data-nonce="' + user_tools.nonce + '" id="MBOSchedule" target="_blank">My Classes</button>\n' +
+          '  <span></span>\n' +
           '  <div class="user-info">\n' +
           (state.client_first_name ? '    <span>' + state.client_first_name + ' ' + state.client_last_name + '</span> \n' : "<span></span>") +
           '    <button data-nonce="' + user_tools.nonce + '" id="MBOLogout" ><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12H15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M8 7L3 12L8 17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M21 3L21 21" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></button>\n' +

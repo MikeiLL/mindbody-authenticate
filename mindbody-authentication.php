@@ -7,8 +7,8 @@
  * @package MZMBOAUTH
  *
  * @wordpress-plugin
- * Version:         1.0.0
- * Stable tag:      1.0.0
+ * Version:         1.0.1
+ * Stable tag:      1.0.1
  * Author:          mZoo.org
  * Author URI:      http://www.mZoo.org/
  * Plugin URI:      http://www.mzoo.org/
@@ -31,7 +31,7 @@ define( NS . 'MZ', 'MZoo\MzMindbody' );
 
 define( NS . 'PLUGIN_NAME', 'mz-mbo-auth' );
 
-define( NS . 'PLUGIN_VERSION', '1.0.0' );
+define( NS . 'PLUGIN_VERSION', '1.0.1' );
 
 define( NS . 'PLUGIN_NAME_DIR', plugin_dir_path( __FILE__ ) );
 

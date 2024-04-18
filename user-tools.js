@@ -91,26 +91,27 @@
         form += `</form>`;
         $.colorbox({html: '<h1 id="registerheading">Looks like you need to register with our studio.</h1><div id="registernotice"></div>' + form});
 
-        on('submit', '#mzStudioRegisterForm', function (event) {
-          event.preventDefault();
-          let form = event.target;
-          let data = new FormData(form);
-          fetch(mz_mbo_state.base_url + `registeruser?`, {method: 'POST', body: data, credentials: 'include'})
-            .then(r => r.json())
-            .then(json => {
-              if (json.success) {
-                $.colorbox({html:'<h1>Thanks for registering with our studio. You can now sign up for some classes.</h1>'+form});
-              } else {
-                console.log("error", json);
-                // error message on -99 site:
-                // An unexpected error has occurred. You can use the following reference id to help us diagnose your problem: '9e2f64f2-1b49-46ca-afc0-e1f8a07e320f'
-                if (json.error.includes("An unexpected error has occurred. You can use the following reference id to help us diagnose your problem.")) {
-                  json.error = json.error + "<h3>(If you are on the -99 Mindbody Sandbox site, you can probably ignore this message.)</h3>";
-                }
-                DOM('#registernotice').innerHTML = "Something went wrong with your registration. Here's what we know: " + json.error;
+      });
+
+      $(document).on('submit', '#mzStudioRegisterForm', function (event) {
+        event.preventDefault();
+        let form = event.target;
+        let data = new FormData(form);
+        fetch(mz_mbo_state.base_url + `registeruser?`, {method: 'POST', body: data, credentials: 'include'})
+          .then(r => r.json())
+          .then(json => {
+            if (json.success) {
+              $.colorbox({html:'<h1>Thanks for registering with our studio. You can now sign up for some classes.</h1>'+form});
+            } else {
+              console.log("error", json);
+              // error message on -99 site:
+              // An unexpected error has occurred. You can use the following reference id to help us diagnose your problem: '9e2f64f2-1b49-46ca-afc0-e1f8a07e320f'
+              if (json.error.includes("An unexpected error has occurred. You can use the following reference id to help us diagnose your problem.")) {
+                json.error = json.error + "<h3>(If you are on the -99 Mindbody Sandbox site, you can probably ignore this message.)</h3>";
               }
-            });
-        });
+              $('#registernotice').html("Something went wrong with your registration. Here's what we know: " + json.error);
+            }
+          });
       });
 
 
@@ -118,7 +119,6 @@
       * Define the modal container state which changes depending on login state
       */
       function render_mbo_modal() {
-        console.log("render_mbo_modal", mz_mbo_state);
         const message = (mz_mbo_state.message ? '<p>'+mz_mbo_state.message+'</p>' : '');
         $.colorbox({html:'<h1 id="registerheading"></h1><div id="registernotice"></div>'});
         mz_mbo_state.wrapper = '<div class="modal__wrapper" id="signupModalWrapper">';
@@ -302,7 +302,6 @@
       $(document).on('click', "#MBOLogout", function (ev) {
           ev.preventDefault();
           var nonce = $(this).attr("data-nonce");
-          console.log("Logging out");
           $.ajax({
               dataType: 'json',
               url: mz_mindbody_schedule.ajaxurl,

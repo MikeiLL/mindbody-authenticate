@@ -4,10 +4,10 @@
  *
  * This file contains request handling for MZ Mindbody
  *
- * @package MZMBOAUTH
+ * @package MzRegistrantsListing
  */
 
-namespace MZoo\MzMboAuth;
+namespace MZoo\MzRegistrantsListing;
 
 use MZoo\MzMindbody as NS;
 

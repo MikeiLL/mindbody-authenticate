@@ -1,4 +1,4 @@
-=== Mindbody Authentication ===
+=== Mindbody Registrants Listing ===
 Contributors: mikeill
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=A95ZEELLHGECE
 Tags: mindbody, schedule, calendar, yoga, MBO, mindbodyonline, gym, access, restrict
@@ -16,12 +16,6 @@ Coming real soon.
 
 == Installation ==
 
-Steps to install and configure MZ MBO Access:
-
-1. If not already, install MZ Mindbody API plugin.
-2. Upload the directory, `mindbody-authentication` to the `/wp-content/plugins/` directory
-3. Set MBO credentials in Settings->MZ Mindbody Settings page.
-4. More soon...
 
 == Frequently Asked Questions ==
 

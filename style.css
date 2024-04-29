@@ -1,16 +1,27 @@
-#MBOLogout {
+button#MBOLogout {
   border-radius: 20px;
   border: 2px solid #AA0011;
   cursor: pointer;
   display: flex;
 }
 
-#MBOLogout:disabled {
+span#MBOLogout {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button#MBOLogout:disabled {
   border: 2px solid #333;
   cursor: not-allowed;
 }
 
-#MBOLogout svg {
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+button#MBOLogout svg {
   stroke: #AA0011;
   width: 25px;
   height: 25px;

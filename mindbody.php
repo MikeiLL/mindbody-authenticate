@@ -4,10 +4,10 @@
  *
  * This file contains api calls to MZ Mindbody
  *
- * @package MZMBOAUTH
+ * @package MzRegistrantsListing
  */
 
-namespace MZoo\MzMboAuth;
+namespace MZoo\MzRegistrantsListing;
 
 use MZoo\MzMindbody as NS;
 
@@ -126,6 +126,7 @@ class MzMboApiCalls {
             )
         );
         $response_body = json_decode($response['body']);
+    \Mzoo\MzMindbody\MZMBO()->helpers->log($response_body);
     if (empty($response_body->id)) {
         return false;
     }
@@ -150,7 +151,7 @@ class MzMboApiCalls {
         return $response_body;
     }
     foreach($response_body->businessProfiles as $studio){
-      /* \Mzoo\MzMindbody\MZMBO()->helpers->log($studio); */
+      \Mzoo\MzMindbody\MZMBO()->helpers->log($studio);
       if ( (int) $siteID === $studio->businessId ) {
         $_SESSION['MindbodyAuth']['MBO_USER_StudioProfile_ID'] = $studio->profileId;
         $_SESSION['MindbodyAuth']['MBO_USER_Business_ID'] = $studio->businessId;
@@ -306,6 +307,7 @@ class MzMboApiCalls {
     if (is_wp_error($response)) {
       return array( 'error' => $response->get_error_message() );
     }
+    NS\MZMBO()->helpers->log($response);
     switch ($response['response']['code']) {
       case 200:
         // Success

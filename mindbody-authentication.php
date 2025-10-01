@@ -59,7 +59,7 @@ if ( version_compare( PHP_VERSION, MINIMUM_PHP_VERSION, '<' ) ) {
 
     register_uninstall_hook( __FILE__, __NAMESPACE__ . '\mindbody_oauth_uninstall' );
 
-    add_action( 'plugins_loaded', __NAMESPACE__ . '\mindbody_auth_has_mindbody_api', INIT_LEVEL );
+    add_action( 'init', __NAMESPACE__ . '\mindbody_auth_has_mindbody_api', INIT_LEVEL );
 
 }
 

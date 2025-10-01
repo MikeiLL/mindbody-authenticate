@@ -4,7 +4,7 @@
  *
  * Description: Child plugin for mZoo Mindbody Interface, which adds support of OAuth login via Mindbody.
  *
- * @package MzRegistrantsListing
+ * @package MZMBOAUTH
  *
  * @wordpress-plugin
  * Version:         1.0.1
@@ -18,8 +18,8 @@
  * Domain Path:     /languages
  */
 
-namespace MZoo\MzRegistrantsListing;
-use MZoo\MzRegistrantsListing as NS;
+namespace MZoo\MzMboAuth;
+use MZoo\MzMboAuth as NS;
 
 /*
  * Define Constants

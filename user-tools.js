@@ -46,8 +46,7 @@
           this.staffName = $(target).attr("data-staffName");
           this.classTime = $(target).attr("data-time");
           this.class_title = '<h2>' + this.className + ' ' + mz_mindbody_schedule.with + ' ' + this.staffName + '</h2><h3>' + this.classTime + '</h3><hr/>';
-          this.header = '<div class="modal__header" id="modalHeader"><h1>' + mz_mindbody_schedule.signup_heading + '</h1>' + this.class_title + '</div>';
-          this.logoutbutton = '<button data-nonce="' + user_tools.nonce + '" id="MBOLogout" ><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12H15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M8 7L3 12L8 17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M21 3L21 21" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></button>\n';
+          this.header = '<div class="modal__header" id="modalHeader"><h1>'+mz_mindbody_schedule.signup_heading+'</h1>'+this.class_title+'</div>';
           this.signup_button = '<button class="btn btn-primary" data-nonce="'+user_tools.nonce+'" data-location="'+this.location+'" data-classID="'+this.classID+'" id="signUpForClass">' + user_tools.confirm_signup + '</button>';
         }
       };
@@ -57,7 +56,7 @@
           '  <span></span>\n' +
           '  <div class="user-info">\n' +
           (state.client_first_name ? '    <span>' + state.client_first_name + ' ' + state.client_last_name + '</span> \n' : "<span></span>") +
-          '    ' + this.logoutbutton +
+          '    <button data-nonce="' + user_tools.nonce + '" id="MBOLogout" ><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12H15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M8 7L3 12L8 17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M21 3L21 21" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></button>\n' +
           '  </div>\n' +
           '</div>\n';
       }
@@ -90,9 +89,7 @@
         });
         form += `</fieldset><input type="submit" value="Submit">`;
         form += `</form>`;
-        let content = '<h1 id="registerheading">Looks like you need to register with our studio.</h1><div id="registernotice"></div>' + form;
-        content += '<div class=center><p>To connect to a different Mindbody global account, <span data-nonce="' + user_tools.nonce + '" id="MBOLogout">click here to logout</span>.</p></div>';
-        $.colorbox({html: content});
+        $.colorbox({html: '<h1 id="registerheading">Looks like you need to register with our studio.</h1><div id="registernotice"></div>' + form});
 
       });
 
@@ -284,44 +281,7 @@
       $(document).on('click', "a[data-target=mzSignUpModal]", function (ev) {
         ev.preventDefault();
         if (mz_mbo_state.logged_in + "" !== "true") {
-          if (user_tools.missing_oauth_settings + "" === "true") {
-            window.open("https://cart.mindbodyonline.com/sites/35179/cart/add_booking?item%5Binfo%5D=Sun.+Apr+21%2C+2024++9%3A00+am&amp;item%5Bmbo_id%5D=78620&amp;item%5Bmbo_location_id%5D=1&amp;item%5Bname%5D=In-Studio+45+-+Barre&amp;item%5Btype%5D=Class&amp;theme=none&amp;widget_type=schedule", '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
-          } else {
-            window.open(user_tools.mbo_oauth_url, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
-            //https://clients.mindbodyonline.com/ASP/res_a.asp?classDate=04/23/2024&clsLoc=1&tg=27&classId=4708&studioid=67470
-          }
-          //https://cart.mindbodyonline.com/sites/35179/cart/add_booking?item%5Binfo%5D=Sun.+Apr+21%2C+2024++9%3A00+am&amp;item%5Bmbo_id%5D=78620&amp;item%5Bmbo_location_id%5D=1&amp;item%5Bname%5D=In-Studio+45+-+Barre&amp;item%5Btype%5D=Class&amp;theme=none&amp;widget_type=schedule
-
-          //https://cart.mindbodyonline.com/sites/35179/cart/add_booking?item%5Binfo%5D=Sun.+Apr+21%2C+2024++9%3A00+am&item%5Bmbo_id%5D=78620&item%5Bmbo_location_id%5D=1&item%5Bname%5D=In-Studio+45+-+Barre&item%5Btype%5D=Class&theme=none&amp;widget_type=schedule
-
-          //https://cart.mindbodyonline.com/sites/67470/cart/add_booking?item%5Binfo%5D=Sun.+Apr+21%2C+2024++9%3A00+am&item%5Bmbo_id%5D=4708
-
-          //https://cart.mindbodyonline.com/sites/35179/cart/add_booking?item%5Binfo%5D=Sun.+Apr+21%2C+2024++9%3A00+am&item%5Bmbo_id%5D=78620
-
-          //https://cart.mindbodyonline.com/sites/35179/cart/add_booking?item%5Binfo%5D=Wed.+Apr+24%2C+2024++9%3A45+am&item%5Bmbo_id%5D=78723&item%5Bmbo_location_id%5D=1&item%5Bname%5D=In-Studio+45+-+elliptica+Bootcamp&item%5Btype%5D=Class&theme=none&widget_type=schedule
-
-          //https://cart.mindbodyonline.com/sites/35179/cart/add_booking?item%5Bmbo_id%5D=78723&item%5Bmbo_location_id%5D=1&item%5Bname%5D=In-Studio+45+-+elliptica+Bootcamp&item%5Btype%5D=Class&theme=none&widget_type=schedule
-
-          //https://cart.mindbodyonline.com/sites/35179/cart/add_booking?item%5Binfo%5D=Wed.+Apr+24%2C+2024++9%3A45+am&item%5Bmbo_id%5D=78723&item%5Bmbo_location_id%5D=1&item%5Bname%5D=Whatever&item%5Btype%5D=Class&theme=none&widget_type=schedule
-
-          //https://clients.mindbodyonline.com/ASP/res_a.asp?classDate=04/23/2024&clsLoc=1&tg=27&classId=7157&studioid=43474
-
-          //https://cart.mindbodyonline.com/sites/43474/cart/add_booking?item%5Binfo%5D=Wed.+Apr+24%2C+2024++9%3A45+am&item%5Bmbo_id%5D=7157&item%5Bmbo_location_id%5D=1&item%5Bname%5D=Whatever&item%5Btype%5D=Class&theme=none&widget_type=schedule
-
-          //https://cart.mindbodyonline.com/sites/&#45;99/cart/add_booking?item%5Binfo%5D=Wed.+Apr+20%2C+2024++9%3A15+am&item%5Bmbo_id%5D=19115&item%5Bmbo_location_id%5D=1&item%5Bname%5D=Whatever&item%5Btype%5D=Class&theme=none&widget_type=schedule
-
-          //https://cart.mindbodyonline.com/sites/35179/cart/add_booking?item%5Binfo%5D=Wed.+Apr+24%2C+2024++9%3A45+am&item%5Bmbo_id%5D=78723
-
-          /*
-          https://cart.mindbodyonline.com/sites/35179/cart/add_booking?
-          item%5Binfo%5D=Sun.+Apr+21%2C+2024++9%3A00+am
-          &item%5Bmbo_id%5D=78620
-          &item%5Bmbo_location_id%5D=1
-          &item%5Bname%5D=In-Studio+45+-+Barre
-          &item%5Btype%5D=Class
-          &theme=none
-          &widget_type=schedule
-          */
+          window.open(user_tools.mbo_oauth_url, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
         } else {
           mz_mbo_state.classID = ev.target.dataset['classid'];
           mz_mbo_state.initialize(this);

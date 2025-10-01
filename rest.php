@@ -4,10 +4,10 @@
  *
  * This file contains rest endpoint functions for MZ Mindbody
  *
- * @package MzRegistrantsListing
+ * @package MZMBOAUTH
  */
 
-namespace MZoo\MzRegistrantsListing;
+namespace MZoo\MzMboAuth;
 
 // Exit if accessed directly
 defined( 'ABSPATH' ) || exit;

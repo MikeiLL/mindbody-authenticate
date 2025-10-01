@@ -41,6 +41,10 @@ function enqueue_scripts() {
 
   $oauth_options = get_option('mzmbo_oauth_options', ['mz_mindbody_client_id' => '', 'mz_mindbody_client_secret' => '']);
 
+  if (!$oauth_options) {
+    trigger_error("MZ Authentication plugin installed but the settings fields are empty", E_USER_WARNING);
+    return;
+  }
   $translated_strings = \MZoo\MzMindbody\MZMBO()->i18n->get();
 
   $siteId = \MZoo\MzMindbody\Core\MzMindbodyApi::$basic_options['mz_mindbody_siteID'];

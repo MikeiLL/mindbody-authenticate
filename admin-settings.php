@@ -11,12 +11,12 @@
 
 namespace MZoo\MzMboAuth;
 
-use MZoo\MzMindbody as MZ;
+use MZoo\MzMindbody as NS;
 
 // Exit if accessed directly
 defined( 'ABSPATH' ) || exit;
 
-$wposa_obj = MZ\Core\MzMindbodyApi::$settings_page::$wposa_obj;
+$wposa_obj = NS\MZMBO()::$settings_page::$wposa_obj;
 
 $wposa_obj->add_section(
   array(

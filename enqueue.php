@@ -41,7 +41,7 @@ function enqueue_scripts() {
 
   $oauth_options = get_option('mzmbo_oauth_options', ['mz_mindbody_client_id' => '', 'mz_mindbody_client_secret' => '']);
 
-  if (!$oauth_options) {
+  if (!$oauth_options['mz_mindbody_client_secret'] || !$oauth_options['mz_mindbody_client_id']) {
     trigger_error("MZ Authentication plugin installed but the settings fields are empty", E_USER_WARNING);
     return;
   }
@@ -58,7 +58,18 @@ function enqueue_scripts() {
     'nonce'                  => wp_create_nonce( 'mz_mbo_authenticate_with_api' ),
     'subscriberId'             => $siteId
   ];
-
+  if (!$oauth_options['mz_mindbody_client_id'] || !$oauth_options['mz_mindbody_client_secret']) {
+    add_action( 'admin_notices', function(){
+        // TODO: make this work. For now, user may need to guess that fields are required.
+        // May be running too late in the WP lifecycle
+        ?>
+        <div class="notice notice-success is-dismissible">
+        <p><?php _e( 'If you are using Mindbody Authenticate, you must set client id and client secret.', 'mz-mbo-auth' ); ?></p>
+        </div>
+        <?php
+    } );
+    return;
+  }
   $client = new \MZoo\MzMindbody\Client\RetrieveClient();
   $required_client_fields = $client->get_signup_form_fields();
   $logged_somewhere = isset($_SESSION['MindbodyAuth']['MBO_USER_Business_ID'])
@@ -85,6 +96,7 @@ function enqueue_scripts() {
     'mbo_oauth_url'        => "https://signin.mindbodyonline.com/connect/authorize?" . http_build_query($mbo_oauth_url_body),
     'missing_oauth_settings' => empty($oauth_options['mz_mindbody_client_id']) || empty($oauth_options['mz_mindbody_client_secret']) ? 'true' : 'false',
   );
+  // @TODO consider updating to wp_add_inline_script Sept 2025 MikeiLL
   wp_localize_script( 'mz_user_tools', 'user_tools', $params );
 }
 

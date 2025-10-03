@@ -278,7 +278,7 @@
        *
        * Also leads to options to login and sign-up with MBO
        */
-      $(document).on('click', "a[data-target=mzSignUpModal]", function (ev) {
+    $(document).on('click', "a[data-target=mzSignUpModal]", function (ev) {
         ev.preventDefault();
         if (mz_mbo_state.logged_in + "" !== "true") {
           window.open(user_tools.mbo_oauth_url, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
